@@ -1,0 +1,92 @@
+id: act2-11-two-jobs-at-once
+act: 2
+level: 11
+title: Two jobs at once
+technique: loose
+teaches: []
+reuses: [stash, "stash pop", "switch -c", switch, add, "commit -m", status]
+requires: [act2-10-back-out-of-the-merge]
+budget_exception: >-
+  No new commands. The interruption pattern again, but the urgent job now
+  needs a branch of its own rather than a commit straight onto main -
+  which is what a team actually asks for.
+first_month_moment: "A second job arrives before the first one is done."
+estimated_minutes: 15
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-211
+  from: "Marta Vos, warehouse manager"
+  title: Two jobs at once
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: branch_exists
+    name: typo-fix
+    label: "The urgent fix has a branch of its own, `typo-fix`"
+    story: "The fix got a bay of its own."
+
+  - kind: commit_reachable
+    from: typo-fix
+    not_from: "tutorial:act2-desk"
+    file_matches:
+      path: docs/receiving.md
+      matches: "compare with the delivery note"
+    label: "The typo in `docs/receiving.md` is fixed and committed on `typo-fix`"
+    story: "The receiving procedure reads properly again, in the fix's bay."
+
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act2-desk"
+    exactly: 1
+    label: "No new commit landed on `main`: the fix went to a branch"
+    story: "The main line has nothing new on it."
+
+  - kind: head_on_branch
+    name: stocktake-prep
+    label: "Switch back to `stocktake-prep`, the branch you were working on"
+    story: "Back to the stocktake plan."
+
+  - kind: file_content
+    path: docs/stocktake.md
+    contains: "rounds part rolls"
+    label: "Your uncommitted edit to `docs/stocktake.md` is back in the working tree"
+    story: "The half-done plan is in front of you again."
+
+  - kind: stash_count
+    exactly: 0
+    label: "Nothing left in the stash"
+    story: "The back room is empty."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Two jobs that must not touch each other, and one loading floor.
+      The half-done plan has to go to the back room before the
+      forklift can move, and the urgent fix needs a bay of its own.
+  - after_idle: 420s
+    text: |
+      Same opening as the earlier interruption: put the pending work
+      aside first. The difference is where the urgent fix goes. It
+      does not belong on main, so make a branch for it, from main and
+      not from the branch you are on.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git stash
+        git switch main
+        git switch -c typo-fix
+
+      Change "compare with the delivary note" to "compare with the
+      delivery note" in docs/receiving.md, then:
+
+        git add docs/receiving.md
+        git commit -m "Fix a typo in the receiving procedure"
+        git switch stocktake-prep
+        git stash pop

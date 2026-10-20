@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "git-tutorial"
+description = "Learn git by running a warehouse: real commands, a live browser view."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = ["PyYAML>=6.0"]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-cov",
+    "pytest-timeout",
+    "mypy>=1.10",
+    "ruff>=0.5",
+    "types-PyYAML",
+    "jsonschema>=4.21",
+]
+
+[project.scripts]
+wt = "git_tutorial.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+git_tutorial = ["py.typed", "web/assets/*"]
+
+[tool.setuptools.dynamic]
+version = { attr = "git_tutorial.version.__version__" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "unit: pure functions, no subprocess",
+    "integration: shells out to real git",
+    "levels: runs level content (slow)",
+]
+addopts = "--strict-markers"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src/git_tutorial"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

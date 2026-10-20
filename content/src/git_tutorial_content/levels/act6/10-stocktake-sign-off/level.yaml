@@ -1,0 +1,188 @@
+id: act6-10-stocktake-sign-off
+act: 6
+level: 10
+title: Stocktake sign-off
+technique: loose
+teaches: []
+reuses: ["log --merge", "restore --theirs", rm, "conflict resolution", pull, add, "commit -m", push, tag]
+requires: [act6-09-dead-stock-sheets]
+first_month_moment: "One pull, three files held, three different right answers, and then the sign-off."
+estimated_minutes: 22
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-610
+  from: "Marta Vos, warehouse manager"
+  title: Stocktake sign-off
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: answer
+    id: prices
+    equals: Ines
+    accepts: ["Ines Calder", "ines"]
+    prompt: "Who made the Head Office commit that changed the price list? (first name is enough)"
+    label: "Name the author of the price list commit from Head Office, using `git log --merge`"
+    story: "Whose delivery note is the price change?"
+
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "Finish the merge `git pull` started: no merge left in progress"
+    story: "Inspection is over."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is still in conflict"
+    story: "Nothing is still held."
+
+  - kind: no_conflict_markers
+    at: main
+    label: "No conflict markers committed in any file on `main`"
+    story: "Not one inspection tag left, in any sheet."
+
+  - kind: all_of
+    assert:
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: main
+        contains: "38 rolls counted."
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: main
+        contains: "26 bundles counted."
+      - kind: not
+        assert:
+          - kind: file_content
+            path: stock/aisle-b.md
+            at: main
+            contains: "39 rolls"
+          - kind: file_content
+            path: stock/aisle-b.md
+            at: main
+            contains: "Count after the Fennick order"
+    label: "Hand-merge `stock/aisle-b.md`: Theo's B-14 (38 rolls) and your B-15 (26 bundles), nothing else"
+    story: "Each bin's count comes from whoever counted it last."
+
+  - kind: file_content
+    path: suppliers/price-list.md
+    at: main
+    equals: |
+      # Supplier prices
+
+      Prices agreed with Kestrelby Packaging, per unit, before VAT.
+
+          [pallet-wrap]
+          unit = "roll"
+          price = 4.45
+
+          [cartons]
+          unit = "bundle of 25"
+          price = 11.90
+
+      Prices hold until 30 June. After that, ask Head Office for the
+      new list before ordering.
+    label: "`suppliers/price-list.md` on `main` is Head Office's version, exactly (`git restore --theirs`)"
+    story: "Head Office's prices stand."
+
+  - kind: all_of
+    assert:
+      - kind: file_absent
+        path: docs/stocktake-checklist.md
+        at: main
+      - kind: file_absent
+        path: docs/stocktake-checklist.md
+    label: "`docs/stocktake-checklist.md` is deleted with `git rm`, as Head Office retired it"
+    story: "The checklist is off the books."
+
+  - kind: all_of
+    assert:
+      - kind: commit_reachable
+        from: main
+        message_matches: "^Count aisle B for the final stocktake"
+      - kind: commit_reachable
+        from: main
+        message_matches: "^Send the April price list"
+      - kind: commit_reachable
+        from: main
+        message_matches: "^Retire the stocktake checklist"
+    label: "All three Head Office commits are in the history of `main`: do not force over them"
+    story: "Theo's and Ines's work is all on the record."
+
+  - kind: all_of
+    assert:
+      - kind: commit_reachable
+        from: main
+        message_matches: "^Scan aisle B for the final stocktake"
+      - kind: commit_reachable
+        from: main
+        message_matches: "^Tick off the stocktake checklist"
+    label: "Both of your own commits are in the history of `main` too"
+    story: "And so is yours."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Push, so Head Office's `main` is the same commit as your `main`"
+    story: "Head Office has the final stocktake."
+
+  - kind: tag_exists
+    name: stocktake-final
+    "on": main
+    label: "Create the tag `stocktake-final` on the merged commit at the top of `main`"
+    story: "Marta's seal goes on the settled records."
+
+  - kind: head_office_ref
+    ref: refs/tags/stocktake-final
+    exists: true
+    at: main
+    label: "Push the tag `stocktake-final` to Head Office"
+    story: "And Head Office holds the seal."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "Stocktake week is over."
+
+hints:
+  - after_idle: 180s
+    text: |
+      One pull, three crates held, three different answers. Walk round
+      before you touch anything: which sheets, what kind of conflict
+      each one is, and whose commits are on the other side. Then settle
+      them one at a time, and seal the result only once it is at Head
+      Office.
+  - after_idle: 420s
+    text: |
+      `git status` gives each file's kind. "both modified" is edited by
+      hand, or taken whole with `git restore --theirs`. "deleted by
+      them" is settled with `git rm`. `git log --merge` shows which
+      commit, and which author, sits on each side.
+
+      Aisle B needs both sides, so edit it. The price list is Head
+      Office's whole. The checklist is retired. Push before tagging, so
+      the tag goes on the commit Head Office has.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git pull
+        git status
+        git log --merge --oneline
+
+      Edit stock/aisle-b.md so B-14 reads "38 rolls counted." and B-15
+      reads "26 bundles counted.", with no markers. Then:
+
+        git restore --theirs suppliers/price-list.md
+        git add stock/aisle-b.md suppliers/price-list.md
+        git rm docs/stocktake-checklist.md
+        git commit --no-edit
+        git push
+        git tag stocktake-final
+        git push origin stocktake-final

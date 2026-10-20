@@ -1,0 +1,77 @@
+id: act4-01-who-is-head-office
+act: 4
+level: 1
+title: Who is Head Office?
+technique: loose
+teaches: [clone, "remote -v"]
+reuses: ["log --oneline", status]
+requires: [act3-10-pick-the-right-fix]
+first_month_moment: "Day one: somebody sends you an address and says clone it."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-401
+  from: "Marta Vos, warehouse manager"
+  title: Who is Head Office?
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: answer
+    id: remote_name
+    equals: origin
+    accepts: ["origin (fetch)", "origin (push)"]
+    prompt: "What is the remote called?"
+    label: "Name the remote that `git remote -v` lists"
+    story: "What do the records call Head Office?"
+
+  - kind: answer
+    id: fresh_commits
+    equals: "10"
+    prompt: "How many commits does a brand-new clone have on its main branch?"
+    label: "Count the commits a fresh `git clone` arrives with"
+    story: "What does a new starter's copy of the records hold on day one?"
+
+  - kind: head_on_branch
+    name: main
+    label: "Stay on the `main` branch in your own repository"
+    story: "Your own copy stays where it was."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree unchanged: this job only reads"
+    story: "Look, don't touch. This job is finding out who you report to."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Two questions, two commands. One asks your copy of the records
+      where it came from. The other makes a second copy, the one a new
+      starter would get from Head Office, so you can see what is in it.
+  - after_idle: 420s
+    text: |
+      `git remote -v` lists the remotes this repository knows about,
+      with the address of each.
+
+      `git clone <address> <folder>` makes a full copy in a new
+      folder. Put it next to this one, not inside it:
+
+        git clone "$(git remote get-url origin)" ../new-starter
+  - after_idle: 900s
+    text: |
+      Look, then copy, then count:
+
+        git remote -v
+        rm -rf ../new-starter
+        git clone "$(git remote get-url origin)" ../new-starter
+        git -C ../new-starter log --oneline
+
+      Count the lines, then type the remote's name and that number
+      into the job sheet, or use `wt answer remote_name origin` in the
+      terminal. Delete `../new-starter` whenever you like; nothing
+      later needs it.

@@ -1,0 +1,112 @@
+id: act2-12-close-the-job
+act: 2
+level: 12
+title: Close the job
+technique: loose
+teaches: []
+reuses: ["conflict resolution", merge, "commit -m", "log --graph --all", add, status]
+requires: [act2-11-two-jobs-at-once]
+budget_exception: >-
+  No new commands. Two files conflicting in one merge, because a student
+  who has only ever resolved one has not yet met the part that makes real
+  merges tiring - having to keep going.
+first_month_moment: "A sign-off merge that touches everything."
+estimated_minutes: 18
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-212
+  from: "Marta Vos, warehouse manager"
+  title: Close the job
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "The merge is finished"
+    story: "The job is closed, not left half-signed."
+
+  - kind: conflicted
+    expected: false
+    label: "Neither file is still in conflict"
+    story: "Nothing is still held at inspection."
+
+  - kind: parent_count
+    of: main
+    count: 2
+    label: "A merge commit on `main`, with both branches as parents"
+    story: "One record that joins the sign-off to the main line."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "Aisle D fit-out signed off"
+    label: "`dispatch/log.md` on `main` keeps the branch's line"
+    story: "The sign-off is in the dispatch log."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "Fennick order dispatched"
+    label: "`dispatch/log.md` on `main` keeps main's line as well"
+    story: "And Theo's dispatch entry is still there."
+
+  - kind: file_content
+    path: README.md
+    at: main
+    contains: "gate 2 or in aisle D"
+    label: "`README.md` on `main` says what you agreed"
+    story: "Drivers know where out-of-hours deliveries go."
+
+  - kind: not
+    label: "No conflict markers committed in either file"
+    story: "No inspection tags left on any record."
+    assert:
+      - kind: file_content
+        path: dispatch/log.md
+        at: main
+        contains: "<<<<<<<"
+      - kind: file_content
+        path: README.md
+        at: main
+        contains: "<<<<<<<"
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Nothing left uncommitted in the working tree"
+    story: "Job closed, floor clear."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Start it and read the list. Git holds every crate it could not
+      settle at inspection, and this time there is more than one.
+      Settling the first does not finish the merge.
+  - after_idle: 420s
+    text: |
+      Work one file at a time and let `git status` keep score. A file
+      moves out of the unmerged list when you stage it, so the list
+      shrinking is how you know you are making progress.
+
+      Only commit when the list is empty.
+  - after_idle: 900s
+    text: |
+      Start, then take them in turn:
+
+        git merge aisle-d-signoff
+        git status
+
+      In dispatch/log.md keep both lines, one above the other. In
+      README.md write one line about out-of-hours deliveries that
+      contains the exact phrase `gate 2 or in aisle D`. Delete every
+      marker line in both files, then:
+
+        git add dispatch/log.md README.md
+        git status
+        git commit --no-edit

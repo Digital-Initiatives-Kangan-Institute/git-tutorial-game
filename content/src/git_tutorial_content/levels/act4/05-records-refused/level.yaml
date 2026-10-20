@@ -1,0 +1,86 @@
+id: act4-05-records-refused
+act: 4
+level: 5
+title: Head Office refused your records
+technique: loose
+teaches: []
+reuses: [push, pull, status, "log --graph --all", "log --oneline"]
+requires: [act4-04-take-the-updates]
+budget_exception: >-
+  No new commands. This is the error message a junior sees more than any
+  other, and it is made entirely of things already taught: a push that
+  cannot fast-forward, and the pull that fixes it. Meeting it with no new
+  vocabulary to learn is the point.
+first_month_moment: "! [rejected] main -> main (fetch first)"
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-405
+  from: "Marta Vos, warehouse manager"
+  title: Head Office refused your records
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: ahead_behind
+    branch: main
+    upstream: origin/main
+    ahead: 0
+    behind: 0
+    label: "Make `main` and `origin/main` agree"
+    story: "Your records and Head Office's match again."
+
+  - kind: commit_reachable
+    from: "origin/main"
+    message_matches: "^Correct the pallet wrap price"
+    label: "Keep Ines's commit on `origin/main`: do not force over it"
+    story: "Ines's price correction is still at Head Office."
+
+  - kind: commit_reachable
+    from: "origin/main"
+    message_matches: "^Write up after-hours deliveries"
+    label: "Push your own commit to `origin/main` as well"
+    story: "And your write-up has gone up beside it."
+
+  - kind: parent_count
+    of: main
+    count: 2
+    label: "Join the two with a merge commit, which is what pulling before pushing makes"
+    story: "Two lines of records, joined before they went up."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Read the refusal rather than working round it. Head Office has
+      records you have not seen, and taking yours as they are would
+      throw hers away.
+
+      Git is refusing in order to protect somebody else's commit.
+  - after_idle: 420s
+    text: |
+      The fix is in the message: fetch first. Or, in one command,
+      `git pull`, which fetches and merges exactly as in the last job.
+
+      Afterwards your `main` contains both lines of work, and the push
+      can move the remote branch forwards.
+  - after_idle: 900s
+    text: |
+      Bring hers in, then send yours:
+
+        git push             rejected, and it says why
+        git pull --no-edit   fetch and merge; a merge commit appears
+        git log --oneline --graph --all
+        git push             accepted now
+        git status
+
+      "Everything up-to-date" is the state you are aiming for.

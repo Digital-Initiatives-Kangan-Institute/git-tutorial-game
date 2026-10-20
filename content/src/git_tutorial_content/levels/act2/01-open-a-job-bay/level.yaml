@@ -1,0 +1,68 @@
+id: act2-01-open-a-job-bay
+act: 2
+level: 1
+title: Open a bay for the aisle D fit-out
+technique: loose
+teaches: [branch, "switch -c"]
+reuses: [status, "log --oneline"]
+requires: [act1-09-every-scanner-log]
+first_month_moment: "You are handed a job and told not to work on main."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-201
+  from: "Marta Vos, warehouse manager"
+  title: Open a bay for the aisle D fit-out
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: branch_exists
+    name: aisle-d-fitout
+    label: "Create a branch named `aisle-d-fitout`"
+    story: "A job bay of its own for the fit-out paperwork."
+
+  - kind: head_on_branch
+    name: aisle-d-fitout
+    label: "Be on `aisle-d-fitout`: `git status` says so"
+    story: "Park yourself in the new bay before you start."
+
+  - kind: branch_at
+    name: main
+    commit: "tutorial:act2-desk"
+    label: "Leave `main` pointing at the commit it pointed at before"
+    story: "The main line stays exactly as the team left it."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Change no files: a branch is not a copy, so the working tree stays clean"
+    story: "Opening a bay moves nothing off the shelves."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Nothing needs writing yet. The job is to open a bay for the
+      fit-out and be standing in it. One command lists the bays that
+      already exist.
+  - after_idle: 420s
+    text: |
+      `git branch` on its own lists the branches. There is one.
+
+      Making a new branch and moving onto it is a single command, not
+      two. The command is `switch`, and it takes a flag meaning "create
+      this one first".
+  - after_idle: 900s
+    text: |
+      Look at what is there, then make the branch and move onto it:
+
+        git branch
+        git switch -c aisle-d-fitout
+        git status
+
+      `git status` will now say "On branch aisle-d-fitout". Nothing
+      about your files has changed.

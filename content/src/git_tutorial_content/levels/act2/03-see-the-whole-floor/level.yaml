@@ -1,0 +1,77 @@
+id: act2-03-see-the-whole-floor
+act: 2
+level: 3
+title: See the whole floor
+technique: loose
+teaches: ["log --graph --all"]
+reuses: [branch, switch]
+requires: [act2-02-between-bays]
+first_month_moment: "Working out how far your branch has drifted from main."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-203
+  from: "Theo Banda, stock controller"
+  title: See the whole floor
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: status_clean
+    allow_untracked: true
+    label: "Change nothing in the working tree: this job only reads the log"
+    story: "A walk round with a clipboard. Nothing moves."
+
+  - kind: answer
+    id: ahead
+    equals: "2"
+    prompt: "How many commits does aisle-d-fitout have that main does not?"
+    label: "Count the commits only on `aisle-d-fitout`"
+    story: "How many records are booked in the fit-out bay alone?"
+
+  - kind: answer
+    id: behind
+    equals: "1"
+    prompt: "How many commits does main have that aisle-d-fitout does not?"
+    label: "Count the commits only on `main`"
+    story: "How many has the main line gained since the bay opened?"
+
+  - kind: answer
+    id: base
+    equals_commit: "tutorial:act2-desk"
+    prompt: "What is the hash of the newest commit both branches share?"
+    label: "Give the hash of the commit where the two branches last agreed"
+    story: "Find the last record both lines have in common."
+
+hints:
+  - after_idle: 180s
+    text: |
+      One command draws the whole floor plan, every shelf line at
+      once. Without asking for all of them you only ever see the one
+      the forklift is parked at, which is why the shape is hard to
+      picture.
+  - after_idle: 420s
+    text: |
+      `git log` takes two flags here. One draws the lines down the
+      left, the other says "every branch, not just mine".
+
+      Read the drawing from the bottom: the two lines start as one.
+  - after_idle: 900s
+    text: |
+      Draw it:
+
+        git log --graph --all --oneline
+
+      Count the commits above the point where the lines join, on each
+      side. Or count them directly:
+
+        git rev-list --count main..aisle-d-fitout
+        git rev-list --count aisle-d-fitout..main
+        git merge-base main aisle-d-fitout
+
+      Type each answer into its box, or use `wt answer ahead <n>`.

@@ -1,0 +1,99 @@
+id: act1-08-one-job-per-booking
+act: 1
+level: 8
+title: One job per booking
+technique: loose
+teaches: []
+reuses: [status, "diff --staged", add, restore, "restore --staged", "commit -m"]
+requires: [act1-07-wrong-sheet-on-the-bench]
+budget_exception: >-
+  No new commands. Three pending changes with three different fates, the
+  first time the act asks the student to choose rather than follow.
+first_month_moment: "Three things half-done and only one of them ready."
+estimated_minutes: 15
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-108
+  from: "Marta Vos, warehouse manager"
+  title: One job per booking
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act1-desk"
+    exactly: 1
+    label: "Make exactly one new commit"
+    story: "One booking, for the one finished job."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "Opening checks written up"
+    label: "Commit the finished line in `dispatch/log.md`"
+    story: "The dispatch log line is booked in."
+
+  - kind: not
+    label: "Keep the draft in `stock/aisle-b.md` out of the commit"
+    story: "Theo's half-done count is not booked in."
+    assert:
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: main
+        contains: "DRAFT"
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: WORKTREE
+    contains: "DRAFT"
+    label: "Leave the draft in your working tree, not thrown away"
+    story: "And it is still there for him to finish."
+
+  - kind: not
+    label: "Restore `README.md` so the accidental edit is gone"
+    story: "The keyboard slip is wiped off the README."
+    assert:
+      - kind: file_content
+        path: README.md
+        at: WORKTREE
+        contains: "asdfasdf"
+
+hints:
+  - after_idle: 180s
+    text: |
+      Three sheets, three different endings: one gets booked in, one
+      goes back on the loading floor, one goes in the bin. Before any
+      of it, check what is already on the packing bench. It is not
+      what you would have put there.
+  - after_idle: 420s
+    text: |
+      Each outcome has a command you already know:
+
+        commit it   git add, then git commit
+        keep it     unstage it, leave it on disk
+        discard it  git restore, which copies over the file on disk
+
+      `git diff --staged` will show you what is currently staged, and
+      it is not the thing you want to commit.
+  - after_idle: 900s
+    text: |
+      The aisle B draft is staged but unfinished, so unstage it. This
+      leaves the text alone; it only takes it out of the next commit:
+
+        git restore --staged stock/aisle-b.md
+
+      The README has "asdfasdf" in it. Throw that away:
+
+        git restore README.md
+
+      Then the dispatch log line, which is the only finished thing:
+
+        git add dispatch/log.md
+        git diff --staged
+        git commit -m "Note the opening checks in the dispatch log"

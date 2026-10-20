@@ -1,0 +1,86 @@
+id: act5-08-theos-bay-is-gone
+act: 5
+level: 8
+title: Theo's bay is gone
+technique: loose
+teaches: []
+reuses: ["fetch --prune", pull, branch, "log --graph --all"]
+requires: [act5-07-the-seal-on-the-wrong-crate]
+first_month_moment: "A colleague's branch has disappeared. Did their work go with it?"
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-508
+  from: "Theo Banda, stock controller"
+  title: Theo's bay is gone
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: not
+    assert:
+      - kind: commit_count
+        from: origin/aisle-c-count
+        at_least: 1
+    label: "Remove the stale `origin/aisle-c-count` with `git fetch --prune`"
+    story: "The notice for Theo's cleared line comes down."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Count aisle C"
+    label: "Pull `main`, so Theo's commit reaches you through Ines's merge"
+    story: "Theo's count is in your records after all."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Make your `main` the same commit as Head Office's `main`"
+    story: "Your records and Head Office's match."
+
+  - kind: answer
+    id: merged_by
+    equals: Ines
+    accepts: ["Ines Calder", "ines"]
+    prompt: "Who merged Theo's branch into main? (first name is enough)"
+    label: "Name the author of the merge commit, from `git log`"
+    story: "Who folded Theo's line in?"
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Theo's shelf line is gone from Head Office, but your repository
+      still has a notice for it. Before deciding his work was lost,
+      find out what Head Office did with it.
+
+      Two things are out of date here: the notice, and your main.
+  - after_idle: 420s
+    text: |
+      `git fetch --prune` updates `origin/main` and removes
+      `origin/aisle-c-count`, which Head Office no longer has.
+
+      Then `git pull` brings `main` up to date. `git log --graph` shows
+      a merge commit with Theo's "Count aisle C" inside it: the branch
+      went, the commit stayed.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git branch -r
+        git fetch --prune
+        git pull
+        git log --oneline --graph -n 4
+        git log -1
+
+      The author of the newest commit is who merged it. Answer with
+      `wt answer merged_by Ines` or on the job sheet.

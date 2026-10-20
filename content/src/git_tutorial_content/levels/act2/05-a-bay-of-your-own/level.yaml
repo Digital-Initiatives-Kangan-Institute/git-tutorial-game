@@ -1,0 +1,79 @@
+id: act2-05-a-bay-of-your-own
+act: 2
+level: 5
+title: A bay of your own
+technique: loose
+teaches: []
+reuses: ["switch -c", branch, add, "commit -m", status]
+requires: [act2-04-rush-order]
+budget_exception: >-
+  No new commands. The first time the whole branch cycle is asked for at
+  once, with nobody naming the steps - which is the thing being practised.
+first_month_moment: "Picking up a job and doing it start to finish."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-205
+  from: "Marta Vos, warehouse manager"
+  title: A bay of your own
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: branch_exists
+    name: racking-checks
+    label: "Create a branch named `racking-checks`"
+    story: "A bay of your own for the checklist."
+
+  - kind: head_on_branch
+    name: racking-checks
+    label: "Be on `racking-checks` at the end"
+    story: "Finish standing in your own bay."
+
+  - kind: commit_reachable
+    from: racking-checks
+    not_from: "tutorial:act2-desk"
+    contains_file: docs/racking-checks.md
+    label: "Commit `docs/racking-checks.md` on that branch"
+    story: "The checklist is booked in, in your bay."
+
+  - kind: branch_at
+    name: main
+    commit: "tutorial:act2-desk"
+    label: "Leave `main` where it was: the commit is not on it yet"
+    story: "The main line has not moved."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Nothing left uncommitted in the working tree"
+    story: "Nothing left lying about."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Three things have to be true at the end: a bay of your own
+      exists, the checklist is booked in on it, and the main shelf
+      line is untouched. The order those happen in is the thing to
+      work out.
+  - after_idle: 420s
+    text: |
+      The branch is the easiest part to forget, and the only part that
+      decides where your commit lands. Make it first, and the rest is
+      the cycle from Act 1: write, stage, commit.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git switch -c racking-checks
+
+      Write docs/racking-checks.md in your editor. Any content counts,
+      as long as the file is there. Then:
+
+        git add docs/racking-checks.md
+        git commit -m "Add the weekly racking checks"
+        git log --oneline --graph --all

@@ -1,0 +1,90 @@
+id: act3-05-the-wrong-pallet
+act: 3
+level: 5
+title: The wrong pallet was booked in
+technique: loose
+teaches: []
+reuses: [reset, add, status, "diff --staged", "commit -m"]
+requires: [act3-04-booked-in-too-early]
+budget_exception: >-
+  No new commands. The same `reset` as the level before with the dial
+  turned one notch, which is the only way the three flags stop being
+  three memorised words - `--soft` and `--mixed` differ in exactly one
+  thing, and you cannot see what that is from one of them.
+first_month_moment: "`git add .` swept up a file nobody else should ever see."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-305
+  from: "Theo Banda, stock controller"
+  title: The wrong pallet was booked in
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act3-desk"
+    exactly: 1
+    label: "End with one commit on top of `main`'s starting point"
+    story: "One crate booked in, holding the right thing."
+
+  - kind: file_content
+    path: README.md
+    at: main
+    contains: "- [Dispatch log](dispatch/log.md)"
+    label: "Commit the `README.md` link to the dispatch log"
+    story: "The README points at the dispatch log."
+
+  - kind: file_absent
+    path: scratch.md
+    at: main
+    label: "Keep `scratch.md` out of the commit on `main`"
+    story: "Your notes are not in the records."
+
+  - kind: file_content
+    path: scratch.md
+    at: WORKTREE
+    contains: "ask Ines when the new price list lands"
+    label: "Keep `scratch.md` on disk, untracked, in the working tree"
+    story: "And they are still on your clipboard, where you wanted them."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave nothing staged that should not be"
+    story: "Nothing on the packing bench that does not belong."
+
+hints:
+  - after_idle: 180s
+    text: |
+      The crate holds two things and you want one of them. Unseal it
+      first; decide what goes back in afterwards.
+
+      Last job's command, with a different flag.
+  - after_idle: 420s
+    text: |
+      `git reset --mixed HEAD~1`, or just `git reset HEAD~1`, since
+      `--mixed` is the default.
+
+      It moves the label back like `--soft` did, and then unstages
+      everything, so nothing is queued and you choose what to add.
+      `scratch.md` goes back to being a file git has never heard of.
+  - after_idle: 900s
+    text: |
+      Un-commit and unstage:
+
+        git reset HEAD~1
+        git status      README.md modified, scratch.md untracked
+
+      Then stage only what belongs:
+
+        git add README.md
+        git diff --staged     check before you commit this time
+        git commit -m "Link the dispatch log"
+
+      `scratch.md` stays untracked, which is what you wanted.

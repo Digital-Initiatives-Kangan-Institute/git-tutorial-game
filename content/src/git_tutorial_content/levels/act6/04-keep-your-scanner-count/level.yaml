@@ -1,0 +1,114 @@
+id: act6-04-keep-your-scanner-count
+act: 6
+level: 4
+title: Keep your scanner count
+technique: loose
+teaches: []
+reuses: ["restore --ours", pull, status, add, "commit -m", push]
+requires: [act6-03-head-office-prices-win]
+first_month_moment: "Your version is the right one, and the pull wants you to choose anyway."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-604
+  from: "Marta Vos, warehouse manager"
+  title: Keep your scanner count
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "Finish the merge `git pull` started: no merge left in progress"
+    story: "Inspection is over."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is still in conflict"
+    story: "Nothing is still held."
+
+  - kind: no_conflict_markers
+    at: main
+    label: "No conflict markers committed anywhere on `main`"
+    story: "No inspection tags left on the stock sheet."
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: main
+    equals: |
+      # Aisle B stock
+
+      **B-14 Pallet wrap, clear**
+
+      41 rolls, scanned 25 March.
+
+      **B-15 Cartons, double wall**
+
+      23 bundles, scanned 25 March.
+    label: "`stock/aisle-b.md` on `main` is your scanned version, exactly (`git restore --ours`)"
+    story: "The fresh scan stands, line for line."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "- Aisle B paper count typed up."
+    label: "Theo's line in `dispatch/log.md` is committed too: only the stock sheet takes your side"
+    story: "Theo's note still goes in the log."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Type up the aisle B paper count"
+    label: "Theo's commit is in the history of `main`: do not force over it"
+    story: "Theo's paper count is on the record, even though it lost."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Record the aisle B scan"
+    label: "Your own commit is in the history of `main` too"
+    story: "And so is your scan."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Push, so Head Office's `main` is the same commit as your `main`"
+    story: "Head Office has the scan."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Pull, and the stock sheet will be held. This time your count is
+      the one that stands: the scan is newer than the clipboard.
+  - after_idle: 420s
+    text: |
+      `git restore --theirs` took Head Office's side last job. Its
+      partner, `git restore --ours <path>`, takes yours: the version you
+      had committed before you pulled.
+
+      Then `git add` and commit as before. Theo's dispatch log line was
+      never in conflict and comes in on its own.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git pull
+        git status
+        git restore --ours stock/aisle-b.md
+        git diff HEAD -- stock/aisle-b.md
+        git add stock/aisle-b.md
+        git commit --no-edit
+        git push
+
+      During the merge, HEAD is still your own last commit, so that
+      diff should print nothing.

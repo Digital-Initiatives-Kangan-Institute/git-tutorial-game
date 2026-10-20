@@ -1,0 +1,83 @@
+id: act2-04-rush-order
+act: 2
+level: 4
+title: Rush order mid-stocktake
+technique: loose
+teaches: [stash, "stash pop"]
+reuses: [switch, status, add, "commit -m"]
+requires: [act2-03-see-the-whole-floor]
+first_month_moment: "\"Can you do this quickly?\" while you are halfway through something."
+estimated_minutes: 15
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-204
+  from: "Theo Banda, stock controller"
+  title: Rush order mid-stocktake
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_reachable
+    from: main
+    not_from: "tutorial:act2-desk"
+    file_matches:
+      path: dispatch/log.md
+      matches: "Rush order for Fennick Garden Centre dispatched"
+    label: "Commit the rush-order line in `dispatch/log.md` on `main`"
+    story: "The rush order is logged on the main line, where Theo needs it."
+
+  - kind: file_absent
+    path: docs/stocktake.md
+    at: main
+    label: "Your unfinished `docs/stocktake.md` did not get committed to `main`"
+    story: "The half-written stocktake plan stayed out of the main records."
+
+  - kind: head_on_branch
+    name: stocktake-prep
+    label: "Switch back to your own branch, `stocktake-prep`"
+    story: "Back to the stocktake bay once the rush is out."
+
+  - kind: file_content
+    path: docs/stocktake.md
+    contains: "part rolls"
+    label: "Your uncommitted edit to `docs/stocktake.md` is back in the working tree"
+    story: "The half-done plan is back in front of you, word for word."
+
+  - kind: stash_count
+    exactly: 0
+    label: "The stash is empty again: you took your work back out"
+    story: "Nothing left waiting in the back room."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Try switching to main and read what git says. It refuses, and
+      the refusal names the file: your stocktake page does not exist
+      on that shelf line, so the forklift would have to throw your
+      change away to get there.
+  - after_idle: 420s
+    text: |
+      You do not have to commit unfinished work to get it out of the
+      way. There is a command that lifts every pending change off to
+      one side and hands you a clean working tree, and a second form
+      of it that puts them back.
+  - after_idle: 900s
+    text: |
+      Put the work aside, do the urgent job, then take it back:
+
+        git stash
+        git switch main
+        git status
+
+      Add the line `- Rush order for Fennick Garden Centre dispatched.`
+      to dispatch/log.md, under "This week", then:
+
+        git add dispatch/log.md
+        git commit -m "Log the Fennick rush order"
+        git switch stocktake-prep
+        git stash pop

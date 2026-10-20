@@ -1,0 +1,85 @@
+id: act5-03-ines-merged-your-rota
+act: 5
+level: 3
+title: Ines merged your rota
+technique: loose
+teaches: ["branch -d", "push --delete"]
+reuses: [switch, pull, "log --graph --all", status]
+requires: [act5-02-seal-the-stocktake]
+first_month_moment: "Your pull request was merged. Now what happens to the branch?"
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-503
+  from: "Ines Calder, Head Office buyer"
+  title: Ines merged your rota
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Merge the peak season rota"
+    label: "Pull Ines's merge commit into your `main`"
+    story: "Your records show the rota folded in, the way Head Office does."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Make your `main` the same commit as Head Office's `main`"
+    story: "Your records and Head Office's match."
+
+  - kind: branch_exists
+    name: peak-rota
+    exists: false
+    label: "Delete your local `peak-rota` branch with `git branch -d`"
+    story: "The rota line comes down here: its work is in main."
+
+  - kind: head_office_ref
+    ref: refs/heads/peak-rota
+    exists: false
+    label: "Delete `peak-rota` at Head Office with `git push origin --delete`"
+    story: "And Head Office takes its copy of the line down too."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Your rota has been folded into main at Head Office, so the shelf
+      line it was on has done its job. Two copies of that line exist:
+      yours, and Head Office's. Both come down.
+
+      But your own records have not heard about the merge yet. Start
+      there.
+  - after_idle: 420s
+    text: |
+      You cannot delete the branch you are on, so `git switch main`
+      first, then `git pull` to bring in Ines's merge commit.
+
+      Look at the graph: the rota commit should now be inside `main`.
+      `git branch -d peak-rota` deletes the name only when its commits
+      are safe in another branch. That check is the reason to use `-d`
+      rather than `-D`.
+
+      Deleting your copy does not touch Head Office's. That is
+      `git push origin --delete peak-rota`.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git switch main
+        git pull
+        git log --oneline --graph --all
+        git branch -d peak-rota
+        git push origin --delete peak-rota
+        git status

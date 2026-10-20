@@ -1,0 +1,68 @@
+id: act2-02-between-bays
+act: 2
+level: 2
+title: Move between bays
+technique: loose
+teaches: [switch]
+reuses: [branch, status]
+requires: [act2-01-open-a-job-bay]
+first_month_moment: "Checking what main looks like without losing your work."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-202
+  from: "Marta Vos, warehouse manager"
+  title: Move between bays
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: head_on_branch
+    name: main
+    label: "Switch back to the `main` branch"
+    story: "Back to the main line for the morning round."
+
+  - kind: file_absent
+    path: docs/aisle-d-fitout.md
+    label: "`docs/aisle-d-fitout.md` is not in your working tree on `main`"
+    story: "The fit-out page is nowhere on the main line."
+
+  - kind: commit_reachable
+    from: aisle-d-fitout
+    contains_file: docs/aisle-d-fitout.md
+    label: "The page is still committed on the `aisle-d-fitout` branch"
+    story: "It is safe in its own bay, exactly as it was booked in."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Nothing pending: `git switch` is not an edit"
+    story: "You moved, you did not touch anything."
+
+hints:
+  - after_idle: 180s
+    text: |
+      The fit-out page is booked in on one shelf line and not on the
+      other. Both are real; the question is which one the forklift is
+      parked at, because the loading floor only ever shows that one.
+  - after_idle: 420s
+    text: |
+      `git branch` shows both names and marks the one you are on.
+
+      Moving to an existing branch is the same command you used to
+      make one, without the flag that means "create it".
+  - after_idle: 900s
+    text: |
+      Move across and look:
+
+        git switch main
+        git status
+        ls docs
+
+      `docs/aisle-d-fitout.md` is gone from the folder. Switch back
+      with `git switch aisle-d-fitout` and it returns. Finish this
+      level on main.

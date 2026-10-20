@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "git-tutorial-content"
+version = "0.3.0"
+description = "Level content for git-tutorial: Tallowmere Distribution."
+requires-python = ">=3.11"
+dependencies = ["PyYAML>=6.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5", "git-tutorial"]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+git_tutorial_content = ["**/*.yaml", "**/*.md", "**/*.sh", "**/*.json", "**/*.py", "*.bundle"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# The tests import git_tutorial_content directly, but play.sh never pip-installs
+# this package - it hands the directory to the engine as GITTUTORIAL_LEVELS. The
+# suite puts src on the path itself rather than relying on the caller.
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint.isort]
+# The engine is a separate distribution, so ruff sees it as third-party and
+# wants it in the same block as pytest and yaml. It is the thing this pack
+# is written against, and the blank line between them is the point.
+known-first-party = ["git_tutorial", "git_tutorial_content"]

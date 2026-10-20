@@ -1,0 +1,106 @@
+id: act3-09-the-wrong-bay-folded-in
+act: 3
+level: 9
+title: The wrong bay was folded in
+technique: loose
+teaches: []
+reuses: ["merge --abort", merge, status, "log --graph --all", branch]
+requires: [act3-08-correct-the-correction]
+budget_exception: >-
+  No new commands. 2.9 and 2.10 escaped a conflict the student had
+  walked into deliberately; this one is the other case, where the
+  conflict is the first sign that the command was wrong. Backing out
+  and then doing the right thing is one motion, and splitting it over
+  two levels would teach the half that is already known.
+first_month_moment: "The conflict is not the problem - you merged the wrong branch."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-309
+  from: "Theo Banda, stock controller"
+  title: The wrong bay was folded in
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "Leave no merge paused"
+    story: "Nothing held at inspection."
+
+  - kind: conflicted
+    expected: false
+    label: "Leave no file in conflict"
+    story: "No crate waiting for a decision."
+
+  - kind: file_content
+    path: suppliers/price-list.md
+    at: main
+    contains: "Never split a bundle"
+    label: "Merge the `hotfix` branch into `main`"
+    story: "The cartons fix is on the main line: that was the bay you wanted."
+
+  - kind: not
+    label: "Keep the `month-end` branch out of `main`"
+    story: "Theo's month close stays in its own bay."
+    assert:
+      - kind: file_content
+        path: dispatch/log.md
+        at: main
+        contains: "## Week ending 28 March"
+
+  - kind: parent_count
+    of: main
+    count: 2
+    label: "Make a merge commit, from merging the right branch"
+    story: "The fold-in is on record."
+
+  - kind: branch_exists
+    name: month-end
+    label: "Leave the `month-end` branch where it is, for later"
+    story: "Theo's bay is untouched."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "first week of April"
+    label: "Keep what `main` says about the stocktake date in `dispatch/log.md`"
+    story: "The main line still says the stocktake slipped."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "End with a clean working tree"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Read `git status` before you resolve anything. It names the
+      branch being merged in: the bay being folded in.
+
+      It is not the one you meant.
+  - after_idle: 420s
+    text: |
+      Resolving this conflict would be careful work to produce a result
+      you do not want: the month close is not ready to go into main.
+
+      Back out of the merge, then merge `hotfix` instead.
+  - after_idle: 900s
+    text: |
+      Out, then in again, properly:
+
+        git status
+        git merge --abort
+        git status
+
+      Then the branch you actually wanted. It touches a different file,
+      so this one combines without asking:
+
+        git merge hotfix
+        git log --oneline --graph --all

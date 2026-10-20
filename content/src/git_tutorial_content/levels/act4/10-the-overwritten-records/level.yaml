@@ -1,0 +1,92 @@
+id: act4-10-the-overwritten-records
+act: 4
+level: 10
+title: The records you overwrote
+technique: loose
+teaches: []
+reuses: [reflog, fetch, push, merge, "log --graph --all", status]
+requires: [act4-09-the-refused-force]
+budget_exception: >-
+  No new commands. Act 3 met the reflog as the victim of a reset; this is
+  the same reflog read after being the one who did the damage, and on a
+  ref the student has never had to look at - `origin/<branch>` keeps its
+  own history of where the remote has been.
+first_month_moment: "You forced, it worked, and a colleague's commit is gone."
+estimated_minutes: 16
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-410
+  from: "Ines Calder, Head Office buyer"
+  title: The records you overwrote
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_reachable
+    from: "origin/stocktake-plan"
+    message_matches: "^Book the stocktake date in the log"
+    label: "Put Ines's commit back on `origin/stocktake-plan`"
+    story: "Ines's booking is back at Head Office."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: "origin/stocktake-plan"
+    contains: "Stocktake is booked for Monday 31 March."
+    label: "Restore the change her commit made to `dispatch/log.md`, not a retyped copy"
+    story: "The date is booked, in her words."
+
+  - kind: commit_reachable
+    from: "origin/stocktake-plan"
+    message_matches: "^Draft the 31 March stocktake plan"
+    label: "Keep your own commit on `origin/stocktake-plan` too"
+    story: "And your plan is still there."
+
+  - kind: ahead_behind
+    branch: stocktake-plan
+    upstream: "origin/stocktake-plan"
+    ahead: 0
+    behind: 0
+    label: "Make `stocktake-plan` and `origin/stocktake-plan` agree again"
+    story: "Your bay and Head Office's match again."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Her commit is not at Head Office any more. It is still in your
+      repository: you read the bulletin before you forced, and reading
+      it is what brought her commit here.
+
+      The question is what name it is under.
+  - after_idle: 420s
+    text: |
+      Remote-tracking branches keep a reflog too:
+
+        git reflog show origin/stocktake-plan
+
+      Read down it. One line is the fetch that brought her commit in,
+      and the line above it is your forced push replacing it.
+  - after_idle: 900s
+    text: |
+      Find it, bring it back, push it:
+
+        git reflog show origin/stocktake-plan
+        git log --oneline <the hash from the fetch line>
+
+      Then merge it into your branch and push:
+
+        git merge --no-edit <that hash>
+        git push
+        git log --oneline --graph --all
+
+      Nothing is retyped: the commit she wrote is the commit that goes
+      back, with her name still on it.

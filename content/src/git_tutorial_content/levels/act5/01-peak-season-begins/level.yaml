@@ -1,0 +1,96 @@
+id: act5-01-peak-season-begins
+act: 5
+level: 1
+title: Peak season begins
+technique: loose
+teaches: []
+reuses: [pull, "switch -c", add, "commit -m", push, status]
+requires: [act4-11-hand-in-the-shift-report]
+budget_exception: >-
+  A warm-up with no new commands. Act 5 is about working alongside other
+  people through Head Office, and it opens with the whole daily loop from
+  Act 4 in one go: take the updates, branch, commit, send it up. Every
+  later job in the act assumes this loop is automatic.
+first_month_moment: "First thing on a Monday: what changed while I was away, and where do I start my work?"
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-501
+  from: "Marta Vos, warehouse manager"
+  title: Peak season begins
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Open on Sundays for peak season"
+    label: "Pull Theo's commit into your `main` before you start"
+    story: "Theo's overnight change to the opening hours is in your records."
+
+  - kind: commit_reachable
+    from: peak-rota
+    message_matches: "^Open on Sundays for peak season"
+    label: "Start `peak-rota` from the updated `main`, so it contains Theo's commit"
+    story: "Your rota is built on this morning's records, not last week's."
+
+  - kind: file_content
+    path: rota/peak.md
+    at: peak-rota
+    contains: "# Peak season rota"
+    label: "Commit `rota/peak.md`, starting `# Peak season rota`, on `peak-rota`"
+    story: "The rota page is written and booked in."
+
+  - kind: head_office_ref
+    ref: refs/heads/peak-rota
+    exists: true
+    at: peak-rota
+    label: "Push `peak-rota` so Head Office has exactly the commit you have"
+    story: "Head Office holds your rota line."
+
+  - kind: tracks
+    branch: peak-rota
+    upstream: origin/peak-rota
+    label: "Set the upstream with `push -u`, so `peak-rota` tracks `origin/peak-rota`"
+    story: "The line knows which Head Office line it reports to."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean: nothing uncommitted"
+    story: "Nothing left lying about."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Peak season starts with a Monday-morning habit: read Head Office's
+      bulletin and take its updates before you open a shelf line of your
+      own. Theo sent something up overnight.
+
+      Then it is the loop from last week: branch, write, commit, send up.
+  - after_idle: 420s
+    text: |
+      `git pull` on `main` brings Theo's commit in. Only then create the
+      branch: `git switch -c peak-rota` starts it from wherever `main`
+      is, so the order matters.
+
+      `git push -u origin peak-rota` sends the branch and sets its
+      upstream in one go.
+  - after_idle: 900s
+    text: |
+      All of it, in order:
+
+        git pull
+        git switch -c peak-rota
+
+      Write `rota/peak.md`, starting with the heading `# Peak season rota`.
+      Then:
+
+        git add rota/peak.md
+        git commit -m "Add the peak season rota"
+        git push -u origin peak-rota
+        git status

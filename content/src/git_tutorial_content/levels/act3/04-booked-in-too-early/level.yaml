@@ -1,0 +1,85 @@
+id: act3-04-booked-in-too-early
+act: 3
+level: 4
+title: Booked in too early
+technique: loose
+teaches: [reset]
+reuses: [status, "diff --staged", "commit -m", "log --oneline"]
+requires: [act3-03-the-cleared-bay]
+first_month_moment: "You committed, then immediately saw the thing you meant to include."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-304
+  from: "Marta Vos, warehouse manager"
+  title: Booked in too early
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act3-desk"
+    exactly: 1
+    label: "End with one commit on top of `main`'s starting point, not two"
+    story: "One sealed crate for the Fennick job, not a crate and an afterthought."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "- Fennick Garden Centre order dispatched."
+    label: "Keep the first line you committed in `dispatch/log.md`"
+    story: "The dispatch is still logged."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "- Third pallet marked fragile."
+    label: "Put the forgotten line in the same commit"
+    story: "And the fragile pallet is in the same record."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave nothing staged or modified in the working tree"
+    story: "Nothing left lying on the packing bench."
+
+  - kind: head_on_branch
+    name: main
+    label: "Stay on the `main` branch"
+    story: "The forklift stays on the main line."
+
+hints:
+  - after_idle: 180s
+    text: |
+      You do not have to undo the work; the work is fine. What you want
+      undone is the *commit*: the crate unsealed and its contents put
+      back on the packing bench, every file exactly as it is.
+
+      There is a command whose whole job is moving a branch label.
+  - after_idle: 420s
+    text: |
+      `git reset --soft HEAD~1` moves `main` back one commit and changes
+      nothing else. Your files stay, and everything that was in the
+      commit is waiting in the staging area, ready for the next one.
+
+      Then add the line you forgot and commit once.
+  - after_idle: 900s
+    text: |
+      Undo the commit, keep the work:
+
+        git reset --soft HEAD~1
+        git status          the changes are staged, not lost
+
+      Add the missing line to dispatch/log.md, under the Fennick line:
+
+        - Third pallet marked fragile.
+
+      Then stage it and make the one commit you meant to make:
+
+        git add dispatch/log.md
+        git commit -m "Log the Fennick dispatch"

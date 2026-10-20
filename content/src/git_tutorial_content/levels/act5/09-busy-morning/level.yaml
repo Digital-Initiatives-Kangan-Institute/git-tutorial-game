@@ -1,0 +1,82 @@
+id: act5-09-busy-morning
+act: 5
+level: 9
+title: Busy morning
+technique: loose
+teaches: []
+reuses: [push, pull, "fetch --prune", status, "log --graph --all"]
+requires: [act5-08-theos-bay-is-gone]
+first_month_moment: "Push refused, a branch list full of ghosts, and a standup in five minutes."
+estimated_minutes: 14
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-509
+  from: "Marta Vos, warehouse manager"
+  title: Busy morning
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_reachable
+    from: origin/main
+    message_matches: "^Log the Easter dispatches"
+    label: "Keep Theo's commit on `origin/main`: do not force over it"
+    story: "Theo's Easter dispatches are still at Head Office."
+
+  - kind: commit_reachable
+    from: origin/main
+    message_matches: "^Add the peak season loading bays"
+    label: "Push your own commit to `origin/main` as well"
+    story: "And your loading bay rules have gone up beside them."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Make Head Office's `main` the same commit as your `main`"
+    story: "Your records and Head Office's match."
+
+  - kind: not
+    assert:
+      - kind: commit_count
+        from: origin/april-slots
+        at_least: 1
+    label: "Remove the stale `origin/april-slots` with `git fetch --prune`"
+    story: "The notice for Ines's withdrawn draft comes down."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Two separate problems, and neither is new. Head Office refuses
+      your records because Theo sent something up first. And your
+      notices still show a shelf line Ines has already cleared.
+
+      Deal with the refusal first, then the notices.
+  - after_idle: 420s
+    text: |
+      The refusal is the one from Act 4: pull, which fetches Theo's
+      commit and merges it with yours, then push.
+
+      `git pull` does not remove stale names, though. `git branch -r`
+      will still list `origin/april-slots` afterwards, until a
+      `git fetch --prune`.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git push                  rejected
+        git pull --no-edit
+        git push
+        git branch -r
+        git fetch --prune
+        git log --oneline --graph --all -n 5

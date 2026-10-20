@@ -1,0 +1,87 @@
+id: act5-06-tidy-after-the-fit-out
+act: 5
+level: 6
+title: Tidy after the fit-out
+technique: loose
+teaches: []
+reuses: [switch, pull, merge, push, "branch -d", "push --delete"]
+requires: [act5-05-seal-the-recount]
+first_month_moment: "Your feature is done. Merge it, and then what do you do with the branch?"
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-506
+  from: "Ines Calder, Head Office buyer"
+  title: Tidy after the fit-out
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Record the aisle E racking delivery"
+    label: "Merge `aisle-e-fitout` into `main`"
+    story: "The fit-out is folded into the warehouse's records."
+
+  - kind: all_of
+    assert:
+      - kind: commit_reachable
+        from: origin/main
+        message_matches: "^Record the aisle E racking delivery"
+      - kind: head_office_ref
+        ref: refs/heads/main
+        exists: true
+        at: main
+    label: "Push `main`, so Head Office's `main` has the fit-out commits"
+    story: "Head Office has the fit-out in its main records."
+
+  - kind: branch_exists
+    name: aisle-e-fitout
+    exists: false
+    label: "Delete your `aisle-e-fitout` branch with `git branch -d`"
+    story: "Your copy of the line comes down."
+
+  - kind: head_office_ref
+    ref: refs/heads/aisle-e-fitout
+    exists: false
+    label: "Delete `aisle-e-fitout` at Head Office with `git push origin --delete`"
+    story: "And Head Office's copy comes down too."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Same tidy-up as the rota, with one difference: nobody has folded
+      this shelf line into main for you. That part is yours too, and it
+      comes first.
+
+      Fold in, send up, then take the line down in both places.
+  - after_idle: 420s
+    text: |
+      Merging happens on the branch that receives the work: switch to
+      `main`, pull in case Head Office has moved, then
+      `git merge aisle-e-fitout` and `git push`.
+
+      Only once `main` holds the commits, here and at Head Office, is
+      the branch name safe to delete: `git branch -d`, then
+      `git push origin --delete`.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git switch main
+        git pull
+        git merge aisle-e-fitout
+        git push
+        git branch -d aisle-e-fitout
+        git push origin --delete aisle-e-fitout
+        git log --oneline --graph --all

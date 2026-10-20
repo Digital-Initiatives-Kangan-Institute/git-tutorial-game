@@ -1,0 +1,78 @@
+id: act2-06-fold-in-the-fit-out
+act: 2
+level: 6
+title: Fold the fit-out into main
+technique: loose
+teaches: [merge]
+reuses: [switch, "log --graph --all", status, branch]
+requires: [act2-05-a-bay-of-your-own]
+first_month_moment: "Your job is done and has to go back into main."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-206
+  from: "Marta Vos, warehouse manager"
+  title: Fold the fit-out into main
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: head_on_branch
+    name: main
+    label: "Be on `main`, the branch you are merging into"
+    story: "Stand on the line that receives the work."
+
+  - kind: branch_at
+    name: main
+    commit: aisle-d-fitout
+    label: "`main` points at the same commit as `aisle-d-fitout`"
+    story: "The main line has caught up with the fit-out bay."
+
+  - kind: parent_count
+    of: main
+    count: 1
+    label: "No merge commit was needed: the merge was a fast-forward"
+    story: "Nothing to join. The main line simply moved up."
+
+  - kind: commit_reachable
+    from: main
+    contains_file: docs/aisle-d-fitout.md
+    label: "`docs/aisle-d-fitout.md` is in `main`'s history now"
+    story: "The fit-out page is part of the main records."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Nothing left uncommitted in the working tree"
+    story: "A tidy floor at the end of the job."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Folding one shelf line into another happens in one direction:
+      you park the forklift at the line that should receive the work,
+      and name the line the work is on. So the first question is which
+      of the two you need to be at.
+  - after_idle: 420s
+    text: |
+      Switch to main first, then merge. `git merge` takes the name of
+      the branch you want to bring in, not the one you are on.
+
+      Look at the graph before and after: it is the clearest way to
+      see what the command did.
+  - after_idle: 900s
+    text: |
+      From aisle-d-fitout:
+
+        git switch main
+        git log --oneline --graph --all
+        git merge aisle-d-fitout
+        git log --oneline --graph --all
+
+      main had no commits of its own since the branch started, so git
+      moves the name forward rather than making a merge commit. That is
+      a fast-forward.

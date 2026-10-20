@@ -1,0 +1,222 @@
+pack_id: tallowmere
+pack_version: "1.0.0"
+format_version: 1
+workspace_dir: tallowmere-ops
+
+acts:
+  - act: 1
+    title: "First shift: booking in"
+    subject: "Reading and recording"
+    complete: true
+    levels:
+      - id: act1-01-shift-handover
+        path: levels/act1/01-shift-handover
+        required: true
+      - id: act1-02-book-in-the-safety-sheet
+        path: levels/act1/02-book-in-the-safety-sheet
+        required: true
+      - id: act1-03-check-before-booking
+        path: levels/act1/03-check-before-booking
+        required: true
+      - id: act1-04-finish-the-dispatch-note
+        path: levels/act1/04-finish-the-dispatch-note
+        required: true
+      - id: act1-05-spill-in-aisle-b
+        path: levels/act1/05-spill-in-aisle-b
+        required: true
+      - id: act1-06-scanner-dumps
+        path: levels/act1/06-scanner-dumps
+        required: true
+      - id: act1-07-wrong-sheet-on-the-bench
+        path: levels/act1/07-wrong-sheet-on-the-bench
+        required: true
+      - id: act1-08-one-job-per-booking
+        path: levels/act1/08-one-job-per-booking
+        required: true
+      - id: act1-09-every-scanner-log
+        path: levels/act1/09-every-scanner-log
+        required: true
+  - act: 2
+    title: "Parallel jobs"
+    subject: "Branches and merging"
+    complete: true
+    levels:
+      - id: act2-01-open-a-job-bay
+        path: levels/act2/01-open-a-job-bay
+        required: true
+      - id: act2-02-between-bays
+        path: levels/act2/02-between-bays
+        required: true
+      - id: act2-03-see-the-whole-floor
+        path: levels/act2/03-see-the-whole-floor
+        required: true
+      - id: act2-04-rush-order
+        path: levels/act2/04-rush-order
+        required: true
+      - id: act2-05-a-bay-of-your-own
+        path: levels/act2/05-a-bay-of-your-own
+        required: true
+      - id: act2-06-fold-in-the-fit-out
+        path: levels/act2/06-fold-in-the-fit-out
+        required: true
+      - id: act2-07-keep-both-jobs
+        path: levels/act2/07-keep-both-jobs
+        required: true
+      - id: act2-08-interrupted-mid-count
+        path: levels/act2/08-interrupted-mid-count
+        required: true
+      - id: act2-09-two-recounts
+        path: levels/act2/09-two-recounts
+        required: true
+      - id: act2-10-back-out-of-the-merge
+        path: levels/act2/10-back-out-of-the-merge
+        required: true
+      - id: act2-11-two-jobs-at-once
+        path: levels/act2/11-two-jobs-at-once
+        required: true
+      - id: act2-12-close-the-job
+        path: levels/act2/12-close-the-job
+        required: true
+  - act: 3
+    title: "Incident reports"
+    subject: "Undoing and recovering"
+    complete: true
+    levels:
+      - id: act3-01-an-old-stocktake
+        path: levels/act3/01-an-old-stocktake
+        required: true
+      - id: act3-02-the-gate-log
+        path: levels/act3/02-the-gate-log
+        required: true
+      - id: act3-03-the-cleared-bay
+        path: levels/act3/03-the-cleared-bay
+        required: true
+      - id: act3-04-booked-in-too-early
+        path: levels/act3/04-booked-in-too-early
+        required: true
+      - id: act3-05-the-wrong-pallet
+        path: levels/act3/05-the-wrong-pallet
+        required: true
+      - id: act3-06-the-marker-git-leaves
+        path: levels/act3/06-the-marker-git-leaves
+        required: true
+      - id: act3-07-already-sent-up
+        path: levels/act3/07-already-sent-up
+        required: true
+      - id: act3-08-correct-the-correction
+        path: levels/act3/08-correct-the-correction
+        required: true
+      - id: act3-09-the-wrong-bay-folded-in
+        path: levels/act3/09-the-wrong-bay-folded-in
+        required: true
+      - id: act3-10-pick-the-right-fix
+        path: levels/act3/10-pick-the-right-fix
+        required: true
+  - act: 4
+    title: "Head Office"
+    subject: "Working with a remote"
+    complete: true
+    levels:
+      - id: act4-01-who-is-head-office
+        path: levels/act4/01-who-is-head-office
+        required: true
+      - id: act4-02-read-the-bulletin
+        path: levels/act4/02-read-the-bulletin
+        required: true
+      - id: act4-03-send-your-bay-up
+        path: levels/act4/03-send-your-bay-up
+        required: true
+      - id: act4-04-take-the-updates
+        path: levels/act4/04-take-the-updates
+        required: true
+      - id: act4-05-records-refused
+        path: levels/act4/05-records-refused
+        required: true
+      - id: act4-06-look-before-you-fold
+        path: levels/act4/06-look-before-you-fold
+        required: true
+      - id: act4-07-finish-ines-job
+        path: levels/act4/07-finish-ines-job
+        required: true
+      - id: act4-08-the-daily-round
+        path: levels/act4/08-the-daily-round
+        required: true
+      - id: act4-09-the-refused-force
+        path: levels/act4/09-the-refused-force
+        required: true
+      - id: act4-10-the-overwritten-records
+        path: levels/act4/10-the-overwritten-records
+        required: true
+      - id: act4-11-hand-in-the-shift-report
+        path: levels/act4/11-hand-in-the-shift-report
+        required: true
+  - act: 5
+    title: "Peak season"
+    subject: "Collaborating through Head Office"
+    complete: true
+    levels:
+      - id: act5-01-peak-season-begins
+        path: levels/act5/01-peak-season-begins
+        required: true
+      - id: act5-02-seal-the-stocktake
+        path: levels/act5/02-seal-the-stocktake
+        required: true
+      - id: act5-03-ines-merged-your-rota
+        path: levels/act5/03-ines-merged-your-rota
+        required: true
+      - id: act5-04-stale-notices
+        path: levels/act5/04-stale-notices
+        required: true
+      - id: act5-05-seal-the-recount
+        path: levels/act5/05-seal-the-recount
+        required: true
+      - id: act5-06-tidy-after-the-fit-out
+        path: levels/act5/06-tidy-after-the-fit-out
+        required: true
+      - id: act5-07-the-seal-on-the-wrong-crate
+        path: levels/act5/07-the-seal-on-the-wrong-crate
+        required: true
+      - id: act5-08-theos-bay-is-gone
+        path: levels/act5/08-theos-bay-is-gone
+        required: true
+      - id: act5-09-busy-morning
+        path: levels/act5/09-busy-morning
+        required: true
+      - id: act5-10-end-of-peak-season
+        path: levels/act5/10-end-of-peak-season
+        required: true
+  - act: 6
+    title: "Stocktake week"
+    subject: "Conflicts with the team"
+    complete: true
+    levels:
+      - id: act6-01-two-hands-on-one-count
+        path: levels/act6/01-two-hands-on-one-count
+        required: true
+      - id: act6-02-read-before-you-fix
+        path: levels/act6/02-read-before-you-fix
+        required: true
+      - id: act6-03-head-office-prices-win
+        path: levels/act6/03-head-office-prices-win
+        required: true
+      - id: act6-04-keep-your-scanner-count
+        path: levels/act6/04-keep-your-scanner-count
+        required: true
+      - id: act6-05-the-sheet-ines-retired
+        path: levels/act6/05-the-sheet-ines-retired
+        required: true
+      - id: act6-06-two-easter-rotas
+        path: levels/act6/06-two-easter-rotas
+        required: true
+      - id: act6-07-not-now
+        path: levels/act6/07-not-now
+        required: true
+      - id: act6-08-the-sheet-that-came-back
+        path: levels/act6/08-the-sheet-that-came-back
+        required: true
+      - id: act6-09-dead-stock-sheets
+        path: levels/act6/09-dead-stock-sheets
+        required: true
+      - id: act6-10-stocktake-sign-off
+        path: levels/act6/10-stocktake-sign-off
+        required: true

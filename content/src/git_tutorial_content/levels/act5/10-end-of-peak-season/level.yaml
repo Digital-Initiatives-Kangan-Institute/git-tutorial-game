@@ -1,0 +1,102 @@
+id: act5-10-end-of-peak-season
+act: 5
+level: 10
+title: End of peak season
+technique: loose
+teaches: []
+reuses: [switch, pull, merge, push, tag, "branch -d", "push --delete"]
+requires: [act5-09-busy-morning]
+first_month_moment: "Ship it: merge, release, tag, tidy up, with the whole team watching."
+estimated_minutes: 16
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-510
+  from: "Marta Vos, warehouse manager"
+  title: End of peak season
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_reachable
+    from: main
+    message_matches: "^List the hours going back to normal"
+    label: "Merge `peak-close` into `main`"
+    story: "The close-down is folded into the warehouse's records."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Log the last peak dispatches"
+    label: "Pull Theo's commit into `main` before you merge"
+    story: "Theo's last peak entry is in there too."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Push `main`, so Head Office's `main` is the same commit as yours"
+    story: "Head Office has the season's last records."
+
+  - kind: tag_exists
+    name: peak-2025
+    "on": main
+    label: "Create the tag `peak-2025` on the commit at the top of `main`"
+    story: "The end of the season is sealed."
+
+  - kind: head_office_ref
+    ref: refs/tags/peak-2025
+    exists: true
+    at: main
+    label: "Push the tag `peak-2025` to Head Office"
+    story: "And Head Office has the seal."
+
+  - kind: branch_exists
+    name: peak-close
+    exists: false
+    label: "Delete your `peak-close` branch with `git branch -d`"
+    story: "Your copy of the line comes down."
+
+  - kind: head_office_ref
+    ref: refs/heads/peak-close
+    exists: false
+    label: "Delete `peak-close` at Head Office with `git push origin --delete`"
+    story: "And Head Office's copy comes down too."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Everything this act has taught, in one job and in a sensible
+      order. Bring main up to date, fold your shelf line in, send it up,
+      seal the result, send the seal, and take the line down.
+
+      Look at the graph first. Theo has been busy.
+  - after_idle: 420s
+    text: |
+      Merge on `main`, after `git pull`, so the merge sits on top of
+      Theo's commit. Push `main` before tagging, so the tag goes on the
+      commit Head Office has.
+
+      `git tag peak-2025` tags `HEAD`. Tags go up by name. Deleting the
+      branch comes last, once its work is safe in `main` at Head Office.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git switch main
+        git pull
+        git merge --no-edit peak-close
+        git push
+        git tag peak-2025
+        git push origin peak-2025
+        git branch -d peak-close
+        git push origin --delete peak-close
+        git log --oneline --graph --all -n 6

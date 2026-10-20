@@ -1,0 +1,122 @@
+id: act6-09-dead-stock-sheets
+act: 6
+level: 9
+title: Dead stock sheets
+technique: loose
+teaches: []
+reuses: [rm, ".gitignore", pull, status, "commit -m", push]
+requires: [act6-08-the-sheet-that-came-back]
+first_month_moment: "Two files deleted upstream, and a scratch file you committed by accident."
+estimated_minutes: 16
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-609
+  from: "Ines Calder, Head Office buyer"
+  title: Dead stock sheets
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "Finish the merge `git pull` started: no merge left in progress"
+    story: "Inspection is over."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is still in conflict"
+    story: "Nothing is still held."
+
+  - kind: no_conflict_markers
+    at: main
+    label: "No conflict markers committed anywhere on `main`"
+    story: "No inspection tags left on the records."
+
+  - kind: all_of
+    assert:
+      - kind: file_absent
+        path: stock/aisle-e-overflow.md
+        at: main
+      - kind: file_absent
+        path: stock/seasonal-twine.md
+        at: main
+    label: "Both retired files are deleted with `git rm`: neither is on `main`"
+    story: "The overflow and twine sheets are off the books."
+
+  - kind: file_absent
+    path: stocktake.tmp
+    at: main
+    label: "`stocktake.tmp` is no longer tracked: not in the commit at `main` (`git rm --cached`)"
+    story: "The scanner's scratch dump is off the books."
+
+  - kind: file_content
+    path: stocktake.tmp
+    contains: "SCAN"
+    label: "`stocktake.tmp` is still on disk in the working tree: untracked, not deleted"
+    story: "But the dump itself is kept, for the scanner."
+
+  - kind: file_content
+    path: .gitignore
+    at: main
+    matches: "(?m)^/?(stocktake\\.tmp|\\*\\.tmp)[ \\t]*$"
+    label: "`.gitignore` on `main` ignores `stocktake.tmp` (or `*.tmp`)"
+    story: "And it will not sneak back on."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Retire the overflow and twine sheets"
+    label: "Ines's commit is in the history of `main`: do not force over it"
+    story: "Ines's retirement is on the record."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Count the overflow and twine stock"
+    label: "Your own commit is in the history of `main` too"
+    story: "So are your counts."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Push, so Head Office's `main` is the same commit as your `main`"
+    story: "Head Office has it."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Two sheets are being taken off the books at Head Office, and a
+      third thing should never have been on them. Pull first and settle
+      the two held sheets, then deal with the scanner's dump.
+  - after_idle: 420s
+    text: |
+      Both stock files are "deleted by them". `git rm` each, as for the
+      opening checks.
+
+      For `stocktake.tmp`, plain `git rm` would delete it from disk too.
+      `git rm --cached <path>` only stops tracking it: the file stays.
+      Then add a line `stocktake.tmp` to `.gitignore` and stage that, so
+      `git status` stops offering it back to you.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git pull
+        git status
+        git rm stock/aisle-e-overflow.md stock/seasonal-twine.md
+        git rm --cached stocktake.tmp
+        echo stocktake.tmp >> .gitignore
+        git add .gitignore
+        git status
+        git commit --no-edit
+        git push

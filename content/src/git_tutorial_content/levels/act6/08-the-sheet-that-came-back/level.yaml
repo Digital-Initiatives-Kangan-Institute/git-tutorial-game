@@ -1,0 +1,107 @@
+id: act6-08-the-sheet-that-came-back
+act: 6
+level: 8
+title: The sheet that came back
+technique: loose
+teaches: []
+reuses: ["restore --theirs", pull, status, add, "commit -m", push]
+requires: [act6-07-not-now]
+first_month_moment: "You deleted a file nobody needed, and somebody had just updated it."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-608
+  from: "Ines Calder, Head Office buyer"
+  title: The sheet that came back
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "Finish the merge `git pull` started: no merge left in progress"
+    story: "Inspection is over."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is still in conflict"
+    story: "Nothing is still held."
+
+  - kind: no_conflict_markers
+    at: main
+    label: "No conflict markers committed anywhere on `main`"
+    story: "No inspection tags left on the records."
+
+  - kind: file_content
+    path: docs/receiving.md
+    at: main
+    equals: |
+      # Receiving a delivery
+
+      Check the paperwork against the load before anything comes off:
+
+          count the pallets   compare with the delivery note
+          check the seals     refuse anything broken
+          chilled loads       probe one case, log the reading
+
+      Then book the stock in and shelve it:
+
+          book in   scanner, BOOK-IN, scan each pallet
+    label: "`docs/receiving.md` is back on `main`, exactly as Ines updated it (`git restore --theirs`)"
+    story: "The receiving sheet is back, with the chilled loads step."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Add chilled loads to receiving"
+    label: "Ines's commit is in the history of `main`: do not force over it"
+    story: "Ines's update is on the record."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Remove the receiving sheet"
+    label: "Your own commit is in the history of `main` too"
+    story: "So is your deletion, overruled by the merge."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Push, so Head Office's `main` is the same commit as your `main`"
+    story: "Head Office has it."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Pull, and read the CONFLICT line. It is the job before last turned
+      round: this time you took the sheet off the books, and Head Office
+      kept it and changed it. Ines wants it back.
+  - after_idle: 420s
+    text: |
+      `git status` shows `docs/receiving.md` as "deleted by us". Git has
+      left Head Office's version on disk, but nothing is settled until
+      you say so.
+
+      `git restore --theirs <path>` makes sure the file is exactly
+      Head Office's version. Then `git add` it to keep it, and commit.
+      (`git rm` would agree with your deletion instead.)
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git pull
+        git status
+        git restore --theirs docs/receiving.md
+        git add docs/receiving.md
+        git commit --no-edit
+        git push

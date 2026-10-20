@@ -1,0 +1,133 @@
+id: act6-07-not-now
+act: 6
+level: 7
+title: Not now
+technique: loose
+teaches: []
+reuses: ["merge --abort", pull, "conflict resolution", add, "commit -m", push, status]
+requires: [act6-06-two-easter-rotas]
+first_month_moment: "Halfway through a conflicted pull, something urgent lands, and the merge is in the way."
+estimated_minutes: 16
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-607
+  from: "Marta Vos, warehouse manager"
+  title: Not now
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "No merge left in progress"
+    story: "Inspection is over."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is still in conflict"
+    story: "Nothing is still held."
+
+  - kind: no_conflict_markers
+    at: main
+    label: "No conflict markers committed anywhere on `main`"
+    story: "No inspection tags left on the records."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "(?i)rush"
+    label: "Commit the rush note `dispatch/2026-03-26.md`, with \"rush\" in the commit message"
+    story: "The rush order is booked."
+
+  - kind: all_of
+    assert:
+      - kind: parent_count
+        of: main
+        count: 2
+      - kind: file_content
+        path: dispatch/2026-03-26.md
+        at: "main^1"
+        contains: "collected at 15:00"
+    label: "The finished rush note is committed before the merge, not inside the merge commit (`git merge --abort` first)"
+    story: "The rush order went out on its own, ahead of the stock count."
+
+  - kind: all_of
+    assert:
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: main
+        contains: "22 bundles counted."
+      - kind: not
+        assert:
+          - kind: file_content
+            path: stock/aisle-b.md
+            at: main
+            contains: "24 bundles"
+    label: "Then pull again and resolve `stock/aisle-b.md` to your B-15 count: 22 bundles"
+    story: "Marta's call: your count of B-15 stands."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Count B-15 for the stocktake"
+    label: "Theo's commit is in the history of `main`: pull again after the abort"
+    story: "Theo's count is on the record."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Record my B-15 count"
+    label: "Your own count commit is in the history of `main` too"
+    story: "And so is yours."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Push, so Head Office's `main` is the same commit as your `main`"
+    story: "Head Office has the rush note and the count."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      The stock count can wait an hour; the Fennick van cannot. Put the
+      inspection back exactly as it was before you pulled, deal with the
+      rush note, and come back to the count after.
+  - after_idle: 420s
+    text: |
+      While a merge is stopped, `git commit` finishes the merge: the
+      rush note would go into the merge commit, tangled up with the
+      unsettled count. `git merge --abort` puts everything back to how
+      it was before the pull. The rush note is untracked, so the abort
+      leaves it alone.
+
+      Finish the note, add it, commit it. Then `git pull` again: it
+      stops in the same place, and now you have time to settle it.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git status
+        git merge --abort
+
+      Finish the last line of dispatch/2026-03-26.md so it ends
+      "collected at 15:00 by the Fennick van." Then:
+
+        git add dispatch/2026-03-26.md
+        git commit -m "Write up the Fennick rush order"
+        git pull
+
+      Edit stock/aisle-b.md so B-15 reads "22 bundles counted." with
+      no markers, then:
+
+        git add stock/aisle-b.md
+        git commit --no-edit
+        git push

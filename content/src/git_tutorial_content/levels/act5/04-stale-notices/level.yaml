@@ -1,0 +1,88 @@
+id: act5-04-stale-notices
+act: 5
+level: 4
+title: Stale notices
+technique: loose
+teaches: ["fetch --prune"]
+reuses: [fetch, branch, "log --graph --all"]
+requires: [act5-03-ines-merged-your-rota]
+first_month_moment: "git branch -a lists twenty branches, and half of them were deleted months ago."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-504
+  from: "Ines Calder, Head Office buyer"
+  title: Stale notices
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: not
+    assert:
+      - kind: commit_count
+        from: origin/fennick-order
+        at_least: 1
+      - kind: commit_count
+        from: origin/pallet-audit
+        at_least: 1
+      - kind: commit_count
+        from: origin/april-returns
+        at_least: 1
+    label: "Remove the `origin/*` names for the three branches Head Office deleted"
+    story: "The notices for cleared shelves come down."
+
+  - kind: commit_count
+    from: origin/easter-hours
+    at_least: 1
+    label: "Keep `origin/easter-hours`: Head Office still has that branch"
+    story: "The one live line keeps its notice."
+
+  - kind: answer
+    id: pruned
+    equals: "3"
+    accepts: ["three"]
+    prompt: "How many origin/ names did pruning remove?"
+    label: "Count the `[deleted]` lines `git fetch --prune` printed"
+    story: "How many notices came down?"
+
+  - kind: answer
+    id: live
+    equals: easter-hours
+    accepts: ["origin/easter-hours"]
+    prompt: "Apart from main, which branch does Head Office still have?"
+    label: "Name the one remote branch left besides `main`, from `git branch -r`"
+    story: "Which line is Head Office still running?"
+
+hints:
+  - after_idle: 180s
+    text: |
+      Your repository is still showing notices for shelves Head Office
+      cleared days ago. Nothing about them is wrong in your records;
+      they are just out of date.
+
+      Start by looking at what you think Head Office has.
+  - after_idle: 420s
+    text: |
+      `git branch -r` lists your `origin/*` names. A plain `git fetch`
+      adds and updates them, but never removes one, even when the
+      branch is gone at Head Office.
+
+      `git fetch --prune` fetches and also deletes each `origin/*` name
+      whose branch Head Office no longer has. It prints a `[deleted]`
+      line for each one.
+  - after_idle: 900s
+    text: |
+      Look, prune, look again:
+
+        git branch -r
+        git fetch --prune
+        git branch -r
+
+      Count the `[deleted]` lines for the first answer. The second is
+      the branch still listed besides `origin/main`. Type them into the
+      job sheet, or use `wt answer pruned 3`.

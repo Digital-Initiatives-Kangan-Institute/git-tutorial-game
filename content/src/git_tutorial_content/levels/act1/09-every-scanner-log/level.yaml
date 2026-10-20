@@ -1,0 +1,87 @@
+id: act1-09-every-scanner-log
+act: 1
+level: 9
+title: Ignore every scanner log
+technique: loose
+teaches: []
+reuses: [status, ".gitignore", add, "commit -m", "log --oneline"]
+requires: [act1-08-one-job-per-booking]
+budget_exception: >-
+  No new commands. Files one name cannot cover, so the pattern is the
+  lesson rather than the mechanism.
+first_month_moment: "Ignoring a whole class of file, not just one file."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-109
+  from: "Theo Banda, stock controller"
+  title: Ignore every scanner log
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: status_clean
+    allow_untracked: false
+    label: "Get `git status` quiet again: nothing untracked, nothing pending"
+    story: "The stock checker walks past every scanner log."
+
+  - kind: commit_reachable
+    from: main
+    not_from: "tutorial:act1-desk"
+    contains_file: docs/scanner.md
+    label: "Commit the new page `docs/scanner.md`"
+    story: "The scanner page is booked in."
+
+  - kind: not
+    label: "Keep every `scanner.log` file out of every commit"
+    story: "No scanner log ever gets booked."
+    assert:
+      - kind: any_of
+        assert:
+          - kind: commit_reachable
+            from: main
+            contains_file: scanner.log
+          - kind: commit_reachable
+            from: main
+            contains_file: scanner.log.1
+          - kind: commit_reachable
+            from: main
+            contains_file: scanner.log.2
+
+  - kind: file_content
+    path: scanner.log.2
+    at: WORKTREE
+    contains: "batch written"
+    label: "Leave the logs on disk: ignored by `.gitignore`, not deleted"
+    story: "The scanner is still writing."
+
+hints:
+  - after_idle: 180s
+    text: |
+      The scanner rotates its log: when one gets long it starts
+      another. There will be a `scanner.log.3` next week and a `.4`
+      after that, so a sign naming today's files will not hold.
+  - after_idle: 420s
+    text: |
+      Look at what the three filenames have in common. It is not the
+      end: only one of them finishes with `.log`. It is the start,
+      and `*` in a `.gitignore` pattern matches any run of characters.
+
+      Then commit that rule along with the new page.
+  - after_idle: 900s
+    text: |
+      One line covers all three, now and after the next rotation:
+
+        scanner.log*
+
+      Add it to `.gitignore`, then:
+
+        git status
+        git add .gitignore docs/scanner.md
+        git commit -m "Ignore rotated scanner logs"
+        git log --oneline

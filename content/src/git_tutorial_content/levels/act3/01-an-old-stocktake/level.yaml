@@ -1,0 +1,77 @@
+id: act3-01-an-old-stocktake
+act: 3
+level: 1
+title: Inspect an old stocktake
+technique: loose
+teaches: [checkout]
+reuses: [status, "log --oneline", switch]
+requires: [act2-12-close-the-job]
+budget_exception: >-
+  `checkout` is tier 3, recognised and never drilled (spec 3.1). It is
+  named here because every answer the student finds online will use it,
+  and meeting it once, explained, beats meeting it at midnight in an
+  answer that assumes they know what it does.
+first_month_moment: "You pasted `git checkout <sha>` from an answer online and the prompt changed."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-301
+  from: "Theo Banda, stock controller"
+  title: Inspect an old stocktake
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: answer
+    id: detached_at
+    prompt: "Which commit was HEAD sitting on? (the short hash is enough)"
+    equals_commit: "tutorial:c08"
+    label: "Name the commit your detached HEAD was on, from `git status`"
+    story: "Read the label on the crate the forklift is parked at."
+
+  - kind: head_on_branch
+    name: main
+    label: "Get back on `main`, with a branch under HEAD again"
+    story: "Drive the forklift back to the end of the main shelf line."
+
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act3-desk"
+    exactly: 0
+    label: "Leave `main` where it was: no commit made while detached"
+    story: "Nothing booked in while you were parked out among the old records."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave nothing half-done in the working tree"
+    story: "The floor is as you found it."
+
+hints:
+  - after_idle: 180s
+    text: |
+      The forklift is parked at an old crate rather than at the end of
+      a shelf line. `git status` is the whole job: its first line says
+      where you are, and its last paragraph says how to get back.
+  - after_idle: 420s
+    text: |
+      The state is called a detached HEAD, and the way out is the
+      command you have used since Act 2, with `main` after it.
+
+      The hash for the answer is in the first line of `git status`,
+      and at the top of `git log --oneline`.
+  - after_idle: 900s
+    text: |
+      Read where you are, answer, then go back:
+
+        git status
+        git log --oneline
+        wt answer detached_at <the hash from git status>
+        git switch main
+
+      `git switch -` works too: the dash means "wherever I was
+      before", the same way `cd -` does.

@@ -1,0 +1,88 @@
+id: act1-01-shift-handover
+act: 1
+level: 1
+title: Read the shift handover
+technique: loose
+teaches: [status, "log --oneline"]
+reuses: []
+budget_exception: "The first level has nothing earlier to reuse."
+first_month_moment: "Reading a repo you have just been given."
+estimated_minutes: 8
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-101
+  from: "Marta Vos, warehouse manager"
+  title: Read the shift handover
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree unchanged: this job only reads"
+    story: "Look, don't touch. Nothing gets moved on your first walk round."
+
+  - kind: answer
+    id: branch
+    equals: main
+    prompt: "Which branch are you on?"
+    label: "Name the branch `git status` says you are on"
+    story: "Which shelf line is the forklift parked at?"
+
+  - kind: answer
+    id: count
+    equals: "10"
+    prompt: "How many commits are in the history?"
+    label: "Count the commits in `git log --oneline`"
+    story: "How many records have been booked in so far?"
+
+  - kind: answer
+    id: second
+    equals_commit: "tutorial:c02"
+    prompt: "What is the hash of the second commit ever made?"
+    label: "Give the hash of the second commit (the second line from the bottom)"
+    story: "Find the second record ever booked."
+
+  - kind: answer
+    id: author
+    equals: Theo
+    accepts: ["Theo Banda", "theo"]
+    prompt: "Who made the most recent commit? (first name is enough)"
+    label: "Name the author of the newest commit, from `git log`"
+    story: "Who was on shift last?"
+
+hints:
+  - after_idle: 180s
+    text: |
+      Marta wants to know you can find your way round the records
+      before you change any. Two commands answer all four questions,
+      and neither changes anything:
+
+        git status   tells you which branch you are on
+        git log      lists the commits, newest first
+  - after_idle: 420s
+    text: |
+      `git log --oneline` prints one line per commit. Count the lines
+      for the commit count.
+
+      Commits are listed newest first, so the SECOND commit ever made
+      is the second line from the BOTTOM.
+
+      Plain `git log` shows the author of each commit, which
+      `--oneline` leaves out.
+  - after_idle: 900s
+    text: |
+      Run these:
+
+        git status                    the first line names your branch
+        git log --oneline             count the lines
+        git log --oneline | tail -2   the two oldest commits
+        git log -1                    the newest, with its author
+
+      Then type each answer into its box on the job sheet, or use
+      `wt answer branch main` in the terminal.

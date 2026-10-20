@@ -1,0 +1,100 @@
+id: act4-06-look-before-you-fold
+act: 4
+level: 6
+title: Look before you fold it in
+technique: loose
+teaches: []
+reuses: [fetch, "remote -v", diff, "log --graph --all", merge]
+requires: [act4-05-records-refused]
+budget_exception: >-
+  No new commands. The bulletin job fetched and stopped because the level
+  said to; this one fetches and stops because the student has a reason
+  to - two commits are waiting and one of them touches the file they are
+  working in. Reading before merging is the habit the act is for.
+first_month_moment: "Four commits landed while you were in a meeting."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-406
+  from: "Theo Banda, stock controller"
+  title: Look before you fold it in
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: answer
+    id: waiting
+    equals: "2"
+    prompt: "How many commits is your main behind origin/main?"
+    label: "Count how far `main` is behind `origin/main` after a fetch"
+    story: "How many records came in on the bulletin?"
+
+  - kind: answer
+    id: touched
+    equals: "stock/aisle-b.md"
+    accepts: ["aisle-b.md"]
+    prompt: "Which file do both their commits and yours change?"
+    label: "Name the file that both your commit and theirs change, from `git diff`"
+    story: "Which sheet have both of you been writing on?"
+
+  - kind: ahead_behind
+    branch: main
+    upstream: origin/main
+    ahead: 2
+    behind: 0
+    label: "Merge `origin/main`: your commit and the merge are left to push"
+    story: "Their records are in, and yours are ready to go up."
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: main
+    contains: "12 bundles in stock."
+    label: "Keep Theo's B-15 count in `stock/aisle-b.md` after the merge"
+    story: "Theo's carton count survived."
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: main
+    contains: "B-13 Tape, brown"
+    label: "Keep your B-13 entry in `stock/aisle-b.md` after the merge"
+    story: "And so did your tape count."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Read the bulletin first, and look before you decide anything.
+      `git status` will say how far behind you are, and `git diff`
+      can show you what is in the gap.
+  - after_idle: 420s
+    text: |
+      `git diff main origin/main` shows what their commits change
+      compared with yours, including which files. One of them is the
+      file you committed this morning.
+
+      Answer both questions, then merge. The two edits are at
+      different ends of the file, so git combines them without asking.
+  - after_idle: 900s
+    text: |
+      Look, then act:
+
+        git fetch
+        git status
+        git log --oneline main..origin/main
+        git diff --stat main origin/main
+
+      Answer `2` and `stock/aisle-b.md` on the job sheet (or with
+      `wt answer waiting 2` and `wt answer touched stock/aisle-b.md`),
+      then:
+
+        git merge --no-edit origin/main
+        git log --oneline --graph --all

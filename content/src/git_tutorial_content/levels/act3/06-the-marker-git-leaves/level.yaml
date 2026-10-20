@@ -1,0 +1,103 @@
+id: act3-06-the-marker-git-leaves
+act: 3
+level: 6
+title: The marker git leaves
+technique: loose
+teaches: []
+reuses: [reset, reflog, "log --oneline", "log --graph --all", status]
+requires: [act3-05-the-wrong-pallet]
+budget_exception: >-
+  No new commands. `ORIG_HEAD` is not a command - it is a name git
+  writes down before every dangerous operation - and the level exists
+  because the first time a student meets it should not be while they
+  are panicking about three lost commits.
+first_month_moment: "You typed --hard when you meant --soft, and a morning's work went."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-306
+  from: "Marta Vos, warehouse manager"
+  title: The marker git leaves
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act3-desk"
+    exactly: 3
+    label: "Put all three commits back on `main`"
+    story: "All three crates back from the yard and on the main line."
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: main
+    contains: "18 bundles on the shelf."
+    label: "Recover the B-15 count in `stock/aisle-b.md`"
+    story: "Bin B-15 is counted again."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "- Bin B-15 counted."
+    label: "Recover the line in `dispatch/log.md`"
+    story: "The log says so."
+
+  - kind: file_content
+    path: docs/receiving.md
+    at: main
+    contains: "staple it to the delivery note"
+    label: "Recover the scanner receipt step in `docs/receiving.md`"
+    story: "And the receipt step is back in the procedure."
+
+  - kind: graph_linear
+    from: "tutorial:act3-desk"
+    to: main
+    label: "Move `main` back with reset, not a merge commit"
+    story: "Put back, not folded back in."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "End with a clean working tree"
+    story: "A tidy floor."
+
+  - kind: head_on_branch
+    name: main
+    label: "Stay on the `main` branch"
+    story: "The forklift stays on the main line."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Three crates are out in the yard with nothing pointing at them,
+      and `main` needs to point at the last one again.
+
+      You did this in the cleared-bay job. The only difference is that
+      this time the name you are moving already exists.
+  - after_idle: 420s
+    text: |
+      Two ways, and they end in the same place.
+
+      `git reflog` shows where main was before the reset, and
+      `git reset --hard <that hash>` moves the label back.
+
+      Git also wrote the answer down for you before it did the damage.
+      It is called `ORIG_HEAD`.
+  - after_idle: 900s
+    text: |
+      Look at what git saved, then go back to it:
+
+        git reflog
+        git log --oneline ORIG_HEAD
+        git reset --hard ORIG_HEAD
+
+      `ORIG_HEAD` is where HEAD was immediately before the last
+      operation that moved it a long way. The hash from the reflog
+      works exactly as well:
+
+        git reset --hard <hash>

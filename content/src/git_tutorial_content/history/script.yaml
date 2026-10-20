@@ -1,0 +1,126 @@
+# Tallowmere Distribution's operations records, built deterministically by
+# build.py.
+#
+# Plain text, so nothing in the tutorial depends on reading code. Every
+# field that feeds a commit sha is pinned: identity, both dates, and the
+# exact file bytes. Change anything here and every downstream hash reflows,
+# which would break any answer key that named a sha - so none does, and CI
+# checks the rebuild is byte-identical with --check.
+#
+# All names are invented. 01632 960xxx is Ofcom's range reserved for fiction.
+
+identities:
+  marta:
+    name: Marta Vos
+    email: marta.vos@tallowmere.example
+  theo:
+    name: Theo Banda
+    email: theo.banda@tallowmere.example
+  ines:
+    name: Ines Calder
+    email: ines.calder@tallowmere.example
+
+commits:
+  - key: c01-initial
+    parents: []
+    author: marta
+    date: "2025-01-06T07:12:00+00:00"
+    message: Initial commit
+    tree:
+      .gitattributes: files/gitattributes
+      # In the root commit, so every anchor a level resets to has one.
+      .gitignore: files/gitignore
+      README.md: files/README-01.md
+
+  - key: c02-hours
+    parents: [c01-initial]
+    author: marta
+    date: "2025-01-06T07:41:00+00:00"
+    message: Add the receiving hours
+    tree:
+      README.md: files/README-02.md
+
+  - key: c03-log
+    parents: [c02-hours]
+    author: theo
+    date: "2025-01-13T13:05:00+00:00"
+    message: Start the dispatch log
+    tree:
+      dispatch/log.md: files/log-03.md
+
+  - key: c04-prices
+    parents: [c03-log]
+    author: ines
+    date: "2025-02-03T10:30:00+00:00"
+    message: Add the supplier price list
+    tree:
+      suppliers/price-list.md: files/price-list-04.md
+
+  - key: c05-phone
+    parents: [c04-prices]
+    author: theo
+    date: "2025-02-10T15:22:00+00:00"
+    message: Add the yard phone number
+    tree:
+      README.md: files/README-05.md
+
+  - key: c06-receiving
+    parents: [c05-phone]
+    author: ines
+    date: "2025-02-19T09:14:00+00:00"
+    message: Write up the receiving procedure
+    tree:
+      docs/receiving.md: files/receiving-06.md
+      README.md: files/README-06.md
+
+  - key: c07-validity
+    parents: [c06-receiving]
+    author: ines
+    date: "2025-03-03T12:48:00+00:00"
+    message: Say how long the prices hold
+    tree:
+      suppliers/price-list.md: files/price-list-07.md
+
+  - key: c08-aisle-b
+    parents: [c07-validity]
+    author: theo
+    date: "2025-03-10T08:05:00+00:00"
+    message: Count aisle B
+    tree:
+      stock/aisle-b.md: files/aisle-b-08.md
+      dispatch/log.md: files/log-08.md
+
+  # Stops mid-sentence on purpose: an early job is finishing someone
+  # else's half-written note.
+  - key: c09-note
+    parents: [c08-aisle-b]
+    author: marta
+    date: "2025-03-17T16:55:00+00:00"
+    message: Start the dispatch note for 3 March
+    tree:
+      dispatch/2025-03-03.md: files/dispatch-0303-09.md
+
+  - key: c10-week
+    parents: [c09-note]
+    author: theo
+    date: "2025-03-21T07:30:00+00:00"
+    message: Log the week's dispatches
+    tree:
+      dispatch/log.md: files/log-10.md
+
+refs:
+  refs/heads/main: c10-week
+  # Each act's anchor: what every one of its setups resets to. Separate
+  # names so the acts can move apart later without a rename.
+  refs/tutorial/act1-desk: c10-week
+  refs/tutorial/act2-desk: c10-week
+  refs/tutorial/act3-desk: c10-week
+  # Act 4 resets Head Office to this as well as the workspace, so "what
+  # origin says" is as repeatable as what the student has.
+  refs/tutorial/act4-desk: c10-week
+  # Act 5 resets Head Office too, tags and all.
+  refs/tutorial/act5-desk: c10-week
+  refs/tutorial/act6-desk: c10-week
+  # Answer keys. Levels never hardcode a sha; they name the ref instead.
+  refs/tutorial/c02: c02-hours
+  refs/tutorial/c08: c08-aisle-b

@@ -1,0 +1,127 @@
+id: act6-06-two-easter-rotas
+act: 6
+level: 6
+title: Two Easter rotas
+technique: loose
+teaches: []
+reuses: ["log --merge", pull, "conflict resolution", add, "commit -m", push]
+requires: [act6-05-the-sheet-ines-retired]
+first_month_moment: "Two people created the same file on the same afternoon."
+estimated_minutes: 14
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-606
+  from: "Marta Vos, warehouse manager"
+  title: Two Easter rotas
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: answer
+    id: who
+    equals: Theo
+    accepts: ["Theo Banda", "theo"]
+    prompt: "Who else created rota/easter.md? (first name is enough)"
+    label: "Name the author of the other commit `git log --merge` lists"
+    story: "Whose draft is the other one?"
+
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "Finish the merge `git pull` started: no merge left in progress"
+    story: "Inspection is over."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is still in conflict"
+    story: "Nothing is still held."
+
+  - kind: no_conflict_markers
+    at: main
+    label: "No conflict markers committed anywhere on `main`"
+    story: "No inspection tags left on the rota."
+
+  - kind: all_of
+    assert:
+      - kind: file_content
+        path: rota/easter.md
+        at: main
+        contains: "- Good Friday 3 April: Theo and Ines"
+      - kind: file_content
+        path: rota/easter.md
+        at: main
+        contains: "- Saturday 4 April: Theo"
+    label: "Theo's two days are in the committed `rota/easter.md`"
+    story: "Good Friday and Saturday are covered."
+
+  - kind: all_of
+    assert:
+      - kind: file_content
+        path: rota/easter.md
+        at: main
+        contains: "- Easter Monday 6 April: Marta and the trainee"
+      - kind: file_content
+        path: rota/easter.md
+        at: main
+        contains: "- Tuesday 7 April: the trainee"
+    label: "Your two days are in the committed `rota/easter.md` as well"
+    story: "So are Monday and Tuesday."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Draft the Easter rota"
+    label: "Theo's commit is in the history of `main`: do not force over it"
+    story: "Theo's draft is on the record."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Write the Easter rota"
+    label: "Your own commit is in the history of `main` too"
+    story: "And so is yours."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Push, so Head Office's `main` is the same commit as your `main`"
+    story: "Head Office has one Easter rota, with all four days."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Pull, and the rota you just wrote is held at inspection. Somebody
+      else made a file with the same name. Find out who before you
+      decide anything: you will want both drafts.
+  - after_idle: 420s
+    text: |
+      `git status` shows `rota/easter.md` as "both added". There was no
+      earlier version, so git fenced off the lines where the two drafts
+      differ. `git log --merge` names the commit, and its author, on
+      the other side.
+
+      Neither side is wrong here: keep all four days, in date order,
+      under the one heading, and delete the markers.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git pull
+        git status
+        git log --merge
+
+      Edit rota/easter.md so it holds the heading once and all four
+      lines: Good Friday, Saturday, Easter Monday, Tuesday. Then:
+
+        git add rota/easter.md
+        git commit --no-edit
+        git push

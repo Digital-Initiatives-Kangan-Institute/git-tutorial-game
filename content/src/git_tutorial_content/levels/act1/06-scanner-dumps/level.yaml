@@ -1,0 +1,86 @@
+id: act1-06-scanner-dumps
+act: 1
+level: 6
+title: Stop recording the scanner dumps
+technique: loose
+teaches: [".gitignore"]
+reuses: [status, add, "commit -m"]
+requires: [act1-05-spill-in-aisle-b]
+first_month_moment: "node_modules in your first pull request."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-106
+  from: "Theo Banda, stock controller"
+  title: Stop recording the scanner dumps
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: status_clean
+    allow_untracked: false
+    label: "Get `git status` quiet: nothing untracked, nothing pending"
+    story: "The stock checker walks past the scanner dumps now."
+
+  - kind: file_content
+    path: .gitignore
+    at: main
+    contains: scanner-export
+    label: "Ignore the `scanner-export/` directory in `.gitignore`, and commit that rule"
+    story: "The sign is up, and it is in the records."
+
+  - kind: commit_reachable
+    from: main
+    not_from: "tutorial:act1-desk"
+    contains_file: docs/opening-checks.md
+    label: "Commit the new page `docs/opening-checks.md`"
+    story: "The opening checks are booked in."
+
+  - kind: not
+    label: "Keep the scanner export out of every commit"
+    story: "No scanner dump ever gets booked."
+    assert:
+      - kind: commit_reachable
+        from: main
+        contains_file: scanner-export/aisle-b.csv
+
+  - kind: file_content
+    path: scanner-export/aisle-b.csv
+    at: WORKTREE
+    contains: "generated"
+    label: "Leave the ignored export files on disk: ignored, not deleted"
+    story: "The scanner still needs its dumps."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Of the four untracked files, ask which ones you could delete
+      today and have back tomorrow just by scanning again. Those do
+      not belong in the records, and the answer is not to sweep them
+      off the floor.
+  - after_idle: 420s
+    text: |
+      A `.gitignore` file lists paths git should stop reporting. This
+      repository already has one, with nothing in it but comments.
+      Open it.
+
+      Add a line for the scanner's export directory, then commit that
+      change together with the new page.
+  - after_idle: 900s
+    text: |
+      Add this line to `.gitignore`:
+
+        scanner-export/
+
+      The trailing slash means "this whole directory". Then:
+
+        git status
+        git add .gitignore docs/opening-checks.md
+        git commit -m "Ignore the scanner exports"
+
+      The export files are still on disk. Ignoring is not deleting.

@@ -1,0 +1,116 @@
+id: act6-01-two-hands-on-one-count
+act: 6
+level: 1
+title: Two hands on one count
+technique: loose
+teaches: []
+reuses: [pull, "conflict resolution", add, "commit -m", push, status]
+requires: [act5-10-end-of-peak-season]
+first_month_moment: "git pull: CONFLICT (content): Merge conflict in a file somebody else changed too."
+estimated_minutes: 14
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-601
+  from: "Marta Vos, warehouse manager"
+  title: Two hands on one count
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "Finish the merge `git pull` started: no merge left in progress"
+    story: "Inspection is over and the record is released."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is still in conflict"
+    story: "Nothing is still held at inspection."
+
+  - kind: no_conflict_markers
+    at: main
+    label: "No conflict markers committed anywhere on `main`"
+    story: "No inspection tags left stuck to the records."
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: main
+    contains: "38 rolls counted for the stocktake."
+    label: "Commit Marta's figure for B-14 in `stock/aisle-b.md`: 38 rolls"
+    story: "The count Marta settled on is the one in the records."
+
+  - kind: not
+    assert:
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: main
+        contains: "37 rolls"
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: main
+        contains: "39 rolls"
+    label: "Neither of the two old figures is left in the committed `stock/aisle-b.md`"
+    story: "One count for B-14, not three."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Count B-14 for the stocktake"
+    label: "Theo's commit is in the history of `main`: pull it, do not force over it"
+    story: "Theo's count is on the record, even though his figure lost."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Record my B-14 count"
+    label: "Your own commit is in the history of `main` too"
+    story: "And so is yours."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Push, so Head Office's `main` is the same commit as your `main`"
+    story: "Head Office has the settled count."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Pull first, before you push. Theo sent his B-14 count up this
+      morning and it disagrees with yours, so the pull will stop with
+      the crate held at inspection. That is expected, and nothing is
+      lost.
+  - after_idle: 420s
+    text: |
+      After `git pull` stops, `git status` lists the conflicted file
+      under "Unmerged paths". Open `stock/aisle-b.md`: between the
+      <<<<<<< and >>>>>>> lines are your figure and Theo's.
+
+      Replace that whole block, markers included, with Marta's line.
+      Then `git add` the file and commit to finish the merge.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git pull
+        git status
+
+      Edit stock/aisle-b.md so the B-14 block reads only:
+
+        38 rolls counted for the stocktake.
+
+      Then:
+
+        git add stock/aisle-b.md
+        git commit --no-edit
+        git push
+        git log --oneline --graph -n 4

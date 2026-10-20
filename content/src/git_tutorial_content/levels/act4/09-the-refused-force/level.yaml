@@ -1,0 +1,78 @@
+id: act4-09-the-refused-force
+act: 4
+level: 9
+title: The force that was refused
+technique: loose
+teaches: ["push --force-with-lease"]
+reuses: [push, fetch, merge, "log --graph --all", status]
+requires: [act4-08-the-daily-round]
+first_month_moment: "You tidied a commit you had already pushed, and now push will not."
+estimated_minutes: 14
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-409
+  from: "Theo Banda, stock controller"
+  title: The force that was refused
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_reachable
+    from: "origin/stocktake-plan"
+    message_matches: "^Book the stocktake date in the log"
+    label: "Keep Ines's commit on `origin/stocktake-plan`"
+    story: "Ines's booking for the stocktake date is still at Head Office."
+
+  - kind: commit_reachable
+    from: "origin/stocktake-plan"
+    message_matches: "^Draft the 31 March stocktake plan"
+    label: "Push your reworded commit to `origin/stocktake-plan`"
+    story: "Your tidied plan has gone up beside it."
+
+  - kind: ahead_behind
+    branch: stocktake-plan
+    upstream: "origin/stocktake-plan"
+    ahead: 0
+    behind: 0
+    label: "Make `stocktake-plan` and `origin/stocktake-plan` agree"
+    story: "Your bay and Head Office's match."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Head Office refuses because your commit is not built on what it
+      holds: you rewrote it, so it is a different commit with a
+      different hash.
+
+      Forcing is one answer. Try the safe force, and read what it says.
+  - after_idle: 420s
+    text: |
+      `git push --force-with-lease` refuses with `stale info`. The
+      remote branch has moved since you last fetched, and forcing now
+      would overwrite a commit you have never seen.
+
+      So go and see it: `git fetch`, then look at what Ines pushed.
+  - after_idle: 900s
+    text: |
+      Look at what the lease was protecting, then do it properly:
+
+        git push                          rejected
+        git push --force-with-lease       rejected: stale info
+        git fetch
+        git log --oneline --graph --all   her commit, on your branch
+
+      Her commit and your rewording are both wanted, so merge and push
+      normally:
+
+        git merge --no-edit origin/stocktake-plan
+        git push

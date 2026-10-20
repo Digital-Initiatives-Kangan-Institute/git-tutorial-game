@@ -1,0 +1,110 @@
+id: act4-11-hand-in-the-shift-report
+act: 4
+level: 11
+title: Hand in the shift report
+technique: loose
+teaches: []
+reuses: [".gitignore", add, "commit -m", push, "switch -c", status]
+requires: [act4-10-the-overwritten-records]
+budget_exception: >-
+  No new commands. The last thing the tutorial asks is the first thing a
+  job asks: publish something somebody else needs, under their rules
+  rather than yours. It also brings `.gitignore` back one last time, to
+  keep rough notes out of work that is handed in.
+first_month_moment: "Submitting work by pushing it, rather than by attaching it to an email."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-411
+  from: "Marta Vos, warehouse manager"
+  title: Hand in the shift report
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: branch_exists
+    name: shift-report
+    label: "Create a branch called `shift-report` to hand in on"
+    story: "A bay of its own for the report."
+
+  - kind: any_of
+    label: "Ignore `scratch.txt` with a line in `.gitignore`, committed on `shift-report`"
+    story: "Rough notes stay on your side of the counter."
+    assert:
+      - kind: file_content
+        path: .gitignore
+        at: shift-report
+        contains: "scratch.txt"
+      - kind: file_content
+        path: .gitignore
+        at: shift-report
+        contains: "*.txt"
+
+  - kind: file_content
+    path: .gitignore
+    at: shift-report
+    contains: "Files that are not part of Tallowmere's records."
+    label: "Keep the rest of `.gitignore`: add a line, do not replace the file"
+    story: "The notice at the top stays up."
+
+  - kind: file_content
+    path: shift-report.md
+    at: shift-report
+    contains: "# Shift report"
+    label: "Commit `shift-report.md` on `shift-report`"
+    story: "The report is written up and booked in."
+
+  - kind: file_absent
+    path: scratch.txt
+    at: shift-report
+    label: "Keep `scratch.txt` out of the commit"
+    story: "Only the finished report goes to Head Office."
+
+  - kind: remote_ref_at
+    remote: origin
+    branch: shift-report
+    equals: shift-report
+    label: "Push `shift-report` to origin, which is the whole of handing in"
+    story: "Head Office has your report."
+
+  - kind: tracks
+    branch: shift-report
+    upstream: origin/shift-report
+    label: "Pair the branch with `origin/shift-report` using `push -u`"
+    story: "Your bay knows where its report went."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Your rough notes are in `scratch.txt`. They helped you write the
+      report and they are not part of it. Ignoring is a line in a file,
+      and `.gitignore` is that file.
+
+      Then the report goes up to Head Office on a bay of its own.
+  - after_idle: 420s
+    text: |
+      Make a branch to hand in on, add a `scratch.txt` line to the end
+      of `.gitignore`, and write `shift-report.md`. `git status` will
+      then list the report and `.gitignore`, and stop mentioning
+      `scratch.txt`.
+
+      Both files get committed: the changed `.gitignore` and the report.
+  - after_idle: 900s
+    text: |
+      All of it:
+
+        git switch -c shift-report
+
+      Add the line `scratch.txt` to the end of `.gitignore`, leaving
+      the comment at the top alone. Write `shift-report.md`, starting
+      with the heading `# Shift report`. Then:
+
+        git status
+        git add .gitignore shift-report.md
+        git commit -m "Hand in my shift report"
+        git push -u origin shift-report

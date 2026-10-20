@@ -1,0 +1,118 @@
+id: act6-03-head-office-prices-win
+act: 6
+level: 3
+title: Head Office's prices win
+technique: loose
+teaches: ["restore --theirs"]
+reuses: [pull, status, add, "commit -m", push]
+requires: [act6-02-read-before-you-fix]
+first_month_moment: "A conflict where one side is simply right, and editing markers by hand would only add mistakes."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-603
+  from: "Ines Calder, Head Office buyer"
+  title: Head Office's prices win
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "Finish the merge `git pull` started: no merge left in progress"
+    story: "Inspection is over."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is still in conflict"
+    story: "Nothing is still held."
+
+  - kind: no_conflict_markers
+    at: main
+    label: "No conflict markers committed anywhere on `main`"
+    story: "No inspection tags left on the price list."
+
+  - kind: file_content
+    path: suppliers/price-list.md
+    at: main
+    equals: |
+      # Supplier prices
+
+      Prices agreed with Kestrelby Packaging, per unit, before VAT.
+
+          [pallet-wrap]
+          unit = "roll"
+          price = 4.45
+
+          [cartons]
+          unit = "bundle of 25"
+          price = 11.90
+
+      Prices hold until 30 June. After that, ask Head Office for the
+      new list before ordering.
+    label: "`suppliers/price-list.md` on `main` is Head Office's version, exactly (`git restore --theirs`)"
+    story: "Head Office's April prices stand, line for line."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "- Kestrelby rang about pallet wrap prices."
+    label: "Your line in `dispatch/log.md` is still committed: only the price list takes their side"
+    story: "Your note of the phone call stays in the log."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Send the April price list"
+    label: "Ines's commit is in the history of `main`: do not force over it"
+    story: "Ines's price list is on the record."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Note the prices Kestrelby quoted"
+    label: "Your own commit is in the history of `main` too"
+    story: "So is your phone call."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Push, so Head Office's `main` is the same commit as your `main`"
+    story: "Head Office has it."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Pull, and look at what is held. Only the price list. On prices,
+      Head Office's count is the one that stands, every line of it, so
+      there is nothing to decide block by block.
+  - after_idle: 420s
+    text: |
+      During a conflict, `git restore --theirs <path>` writes the other
+      side's version of that one file into the working tree, whole, with
+      no markers. In a pull, "theirs" is what came from Head Office.
+
+      It does not mark the file settled. `git add` it, then commit.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git pull
+        git status
+        git restore --theirs suppliers/price-list.md
+        git diff origin/main -- suppliers/price-list.md
+        git add suppliers/price-list.md
+        git commit --no-edit
+        git push
+
+      The diff should print nothing: the file is Head Office's exactly.

@@ -1,0 +1,85 @@
+id: act1-07-wrong-sheet-on-the-bench
+act: 1
+level: 7
+title: The wrong sheet went on the bench
+technique: loose
+teaches: []
+reuses: [status, diff, restore, "restore --staged"]
+requires: [act1-06-scanner-dumps]
+budget_exception: >-
+  No new commands. One file changed twice, staged in between - the shape
+  that makes the three copies visible rather than theoretical.
+first_month_moment: "Staging something, changing your mind, changing it again."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-107
+  from: "Ines Calder, Head Office buyer"
+  title: The wrong sheet went on the bench
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: branch_at
+    name: main
+    commit: "tutorial:act1-desk"
+    label: "Leave `main` where it is: no new commit"
+    story: "Nothing gets booked in on this job."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave nothing staged and nothing changed in the working tree"
+    story: "Bench clear, floor clear."
+
+  - kind: file_content
+    path: docs/receiving.md
+    at: WORKTREE
+    contains: "Check the paperwork against the load"
+    label: "Restore `docs/receiving.md` to its last committed version"
+    story: "The receiving procedure reads as Ines wrote it."
+
+  - kind: not
+    label: "Undo both edits, the staged one and the unstaged one"
+    story: "Both rumours about the scanner are gone, not just the later one."
+    assert:
+      - kind: any_of
+        assert:
+          - kind: file_content
+            path: docs/receiving.md
+            at: WORKTREE
+            contains: "probably faulty"
+          - kind: file_content
+            path: docs/receiving.md
+            at: WORKTREE
+            contains: "definitely faulty"
+
+hints:
+  - after_idle: 180s
+    text: |
+      This sheet was scribbled on twice, and put on the packing bench
+      in between. So there are now two different unwanted versions of
+      it in two different places. Look at both diffs before touching
+      anything.
+  - after_idle: 420s
+    text: |
+      Both diffs show something, so there are two copies to undo and
+      `git restore` is still the only command you need: once with a
+      flag, once without.
+
+      Think about where plain `git restore` copies from before you
+      choose which to run first. It is not the last commit.
+  - after_idle: 900s
+    text: |
+      Unstage first, then overwrite the file on disk:
+
+        git restore --staged docs/receiving.md
+        git restore docs/receiving.md
+
+      In the other order, `git restore` would copy the staging area
+      onto the file, and the staging area still holds the first
+      unwanted edit.

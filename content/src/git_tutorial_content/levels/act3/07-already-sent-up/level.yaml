@@ -1,0 +1,100 @@
+id: act3-07-already-sent-up
+act: 3
+level: 7
+title: Wrong price already sent up
+technique: strict
+teaches: [revert]
+reuses: ["log --oneline", "commit -m", status, diff]
+requires: [act3-06-the-marker-git-leaves]
+first_month_moment: "The bad commit is three commits down and somebody else already has it."
+estimated_minutes: 14
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-307
+  from: "Theo Banda, stock controller"
+  title: Wrong price already sent up
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: not
+    label: "Take the wrong price out of `suppliers/price-list.md` on `main`"
+    story: "Pallet wrap is back at the price Kestrelby actually charge."
+    assert:
+      - kind: file_content
+        path: suppliers/price-list.md
+        at: main
+        contains: "price = 2.40"
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: main
+    contains: "18 bundles on the shelf."
+    label: "Leave the two later commits untouched: the B-15 count stays"
+    story: "The B-15 count is still on record."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "- Bin B-15 counted."
+    label: "Keep the dispatch log line from the later commit"
+    story: "And so is its line in the log."
+
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act3-desk"
+    exactly: 4
+    label: "End with four commits: the three that were there, plus a revert"
+    story: "Three crates as they were, plus one correction crate."
+
+  - kind: not_used_command
+    ops: [reset]
+    label: "Undo it by adding a commit with `git revert`, not with `git reset`"
+    story: "Head Office already has those records. Add a correction; do not rewrite."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Commit the undo, leaving the working tree clean"
+    story: "The correction is booked in, not left on the bench."
+
+  - kind: head_on_branch
+    name: main
+    label: "Stay on the `main` branch"
+    story: "The forklift stays on the main line."
+
+hints:
+  - after_idle: 180s
+    text: |
+      `reset` is the wrong tool here and the job will not accept it.
+      Taking three crates back off the end of the shelf line would take
+      the two good ones with them, and Head Office already has this
+      history.
+
+      You want a correction crate: a commit that undoes another commit.
+  - after_idle: 420s
+    text: |
+      `git revert <hash>` works out what that commit changed, applies
+      the opposite, and commits it. The history grows; nothing in it is
+      rewritten, so anybody who already has it is fine.
+
+      `git log --oneline` has the hash you need. It is the commit that
+      updated the pallet wrap price.
+  - after_idle: 900s
+    text: |
+      Find it and undo it:
+
+        git log --oneline
+        git revert --no-edit <the hash of the price commit>
+
+      `--no-edit` accepts the message git writes for you, which is
+      `Revert "..."`. Without it, git opens an editor.
+
+      Then check what you have:
+
+        git log --oneline
+        git diff HEAD~1 HEAD

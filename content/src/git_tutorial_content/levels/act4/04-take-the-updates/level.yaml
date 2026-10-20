@@ -1,0 +1,89 @@
+id: act4-04-take-the-updates
+act: 4
+level: 4
+title: Take Head Office's updates
+technique: loose
+teaches: [pull]
+reuses: [merge, "log --graph --all", status, "commit -m"]
+requires: [act4-03-send-your-bay-up]
+first_month_moment: "Why is there a merge commit I did not make, and why does my branch have Ines's work in it?"
+estimated_minutes: 14
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-404
+  from: "Ines Calder, Head Office buyer"
+  title: Take Head Office's updates
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: parent_count
+    of: main
+    count: 2
+    label: "End with a merge commit at the tip of `main`, the one `git pull` made"
+    story: "Two lines of records, joined into one."
+
+  - kind: file_content
+    path: docs/receiving.md
+    at: main
+    contains: "If a pallet arrives damaged"
+    label: "Pull Ines's damaged-stock section into `main`"
+    story: "Head Office's new procedure is in your copy."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "Damaged stock procedure added."
+    label: "Keep your own `dispatch/log.md` commit on `main`"
+    story: "And your log line is still there."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Add a damaged stock section"
+    label: "Make Ines's commit, with her name on it, part of your history"
+    story: "Her record, booked under her name."
+
+  - kind: ahead_behind
+    branch: main
+    upstream: origin/main
+    ahead: 2
+    behind: 0
+    label: "Leave two commits to push: yours, and the merge"
+    story: "Two records ready to send up, whenever you are."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor at the end of it."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Your copy of the records and Head Office's have both moved since
+      they last agreed. `git status` will say so once you have read
+      the bulletin.
+
+      One command reads the bulletin and then takes the updates in.
+  - after_idle: 420s
+    text: |
+      `git pull` is two commands in one: `git fetch`, then
+      `git merge origin/main`.
+
+      Both sides moved, so the merge makes a merge commit, exactly as
+      when you joined two of your own branches. The only difference is
+      that the other side is somebody else's work.
+  - after_idle: 900s
+    text: |
+      Bring her work in:
+
+        git status
+        git pull --no-edit
+        git log --oneline --graph --all
+
+      The merge commit at the top is the one pull made for you. Nothing
+      has gone wrong.

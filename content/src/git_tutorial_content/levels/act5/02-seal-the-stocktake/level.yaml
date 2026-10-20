@@ -1,0 +1,70 @@
+id: act5-02-seal-the-stocktake
+act: 5
+level: 2
+title: Seal the March stocktake
+technique: loose
+teaches: [tag]
+reuses: ["log --oneline", push, status]
+requires: [act5-01-peak-season-begins]
+first_month_moment: "Which commit was the version we signed off? Somebody asks, and nobody remembers."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-502
+  from: "Marta Vos, warehouse manager"
+  title: Seal the March stocktake
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: tag_exists
+    name: stocktake-march
+    "on": "tutorial:c08"
+    label: "Create the tag `stocktake-march` on the commit \"Count aisle B\", not on `HEAD`"
+    story: "The seal is on Theo's aisle B count, the one Marta signed off."
+
+  - kind: head_office_ref
+    ref: refs/tags/stocktake-march
+    exists: true
+    at: "tutorial:c08"
+    label: "Push the tag with `git push origin stocktake-march`, so Head Office has it"
+    story: "Head Office holds the same seal, on the same record."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean: a tag changes no files"
+    story: "Sealing moves nothing on the floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      A seal goes on one crate, and stays on that crate. Marta does not
+      want the newest record sealed. She wants Theo's aisle B count,
+      which has two newer commits on top of it now.
+
+      So the first job is finding that commit in the log.
+  - after_idle: 420s
+    text: |
+      `git log --oneline` lists each commit with its short hash. Find the
+      line "Count aisle B" and copy its hash.
+
+      `git tag stocktake-march` on its own would tag `HEAD`, the newest
+      commit. Name the commit after the tag name to tag that commit
+      instead.
+
+      A new tag stays in your repository until you push it by name.
+  - after_idle: 900s
+    text: |
+      Find the hash, tag it, send the tag:
+
+        git log --oneline
+        git tag stocktake-march <hash of "Count aisle B">
+        git log --oneline --decorate
+        git push origin stocktake-march
+
+      `git ls-remote --tags origin` shows what Head Office holds.

@@ -1,0 +1,86 @@
+id: act1-03-check-before-booking
+act: 1
+level: 3
+title: Check before you book in
+technique: loose
+teaches: [diff, "diff --staged"]
+reuses: [status, add, "commit -m"]
+requires: [act1-02-book-in-the-safety-sheet]
+first_month_moment: "\"What am I about to commit?\""
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-103
+  from: "Theo Banda, stock controller"
+  title: Check before you book in
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: head_on_branch
+    name: main
+    label: "Stay on the `main` branch"
+    story: "Same line as before."
+
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act1-desk"
+    exactly: 1
+    label: "Make exactly one new commit, not two"
+    story: "One record for the one finished job."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "Safety sheet booked in"
+    label: "Commit the staged change to `dispatch/log.md`"
+    story: "The dispatch log line was ready, and now it is booked."
+
+  - kind: not
+    label: "Keep the unstaged change to `stock/aisle-b.md` out of the commit"
+    story: "Theo's half-finished count stays off the records."
+    assert:
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: main
+        contains: "B-16"
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: WORKTREE
+    contains: "B-16"
+    label: "Leave the unstaged change in your working tree"
+    story: "And it is still there for Theo to finish."
+
+hints:
+  - after_idle: 180s
+    text: |
+      `git status` tells you WHICH files have changed. It does not tell
+      you WHAT changed inside them. One change is on the packing bench
+      and one is still on the loading floor, and there is a command for
+      looking at each.
+  - after_idle: 420s
+    text: |
+      There are two lists, so there are two questions: what have I
+      changed, and what am I about to commit? `git diff` answers one
+      of them on its own. The other needs a flag, and `git status`
+      names it for you under the first heading it prints.
+  - after_idle: 900s
+    text: |
+      Look before you commit:
+
+        git status
+        git diff              the aisle B edit, not staged
+        git diff --staged     the dispatch log line, staged
+
+      The log line is already staged, so committing takes that and
+      nothing else. You do not need `git add` here at all:
+
+        git commit -m "Note the safety sheet in the dispatch log"
+
+      Then `git status` again: the aisle B edit is still waiting.

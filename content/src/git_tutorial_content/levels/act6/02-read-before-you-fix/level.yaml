@@ -1,0 +1,158 @@
+id: act6-02-read-before-you-fix
+act: 6
+level: 2
+title: Read before you fix
+technique: loose
+teaches: ["log --merge"]
+reuses: [pull, status, "conflict resolution", add, "commit -m", push]
+requires: [act6-01-two-hands-on-one-count]
+first_month_moment: "A pull stops in several files at once, and you need to know how big the job is before you start."
+estimated_minutes: 18
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-602
+  from: "Marta Vos, warehouse manager"
+  title: Read before you fix
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: answer
+    id: files
+    equals: "2"
+    accepts: ["two"]
+    prompt: "How many files does the pull leave in conflict?"
+    label: "Count the files `git status` lists under \"Unmerged paths\""
+    story: "How many sheets are held at inspection?"
+
+  - kind: answer
+    id: blocks
+    equals: "3"
+    accepts: ["three"]
+    prompt: "How many conflict blocks (<<<<<<< lines) are there across those files?"
+    label: "Count the `<<<<<<<` conflict markers across the conflicted files"
+    story: "How many places on those sheets disagree?"
+
+  - kind: answer
+    id: commits
+    equals: "4"
+    accepts: ["four"]
+    prompt: "How many commits does git log --merge list?"
+    label: "Count the commits `git log --merge --oneline` lists, from both sides"
+    story: "How many delivery notes disagree?"
+
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "Finish the merge `git pull` started: no merge left in progress"
+    story: "Inspection is over."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is still in conflict"
+    story: "Nothing is still held."
+
+  - kind: no_conflict_markers
+    at: main
+    label: "No conflict markers committed in any file on `main`"
+    story: "Not one inspection tag left behind, in either sheet."
+
+  - kind: all_of
+    assert:
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: main
+        contains: "39 rolls counted for the stocktake."
+      - kind: not
+        assert:
+          - kind: file_content
+            path: stock/aisle-b.md
+            at: main
+            contains: "37 rolls"
+    label: "Commit your B-14 count (39 rolls) in `stock/aisle-b.md`, and only yours"
+    story: "Counts belong to whoever counted on the floor."
+
+  - kind: all_of
+    assert:
+      - kind: file_content
+        path: suppliers/price-list.md
+        at: main
+        contains: "    price = 4.45\n"
+      - kind: file_content
+        path: suppliers/price-list.md
+        at: main
+        contains: "Prices hold until 30 June."
+      - kind: not
+        assert:
+          - kind: file_content
+            path: suppliers/price-list.md
+            at: main
+            contains: "4.30"
+          - kind: file_content
+            path: suppliers/price-list.md
+            at: main
+            contains: "30 April"
+    label: "Commit Head Office's two price lines in `suppliers/price-list.md`: 4.45 and 30 June"
+    story: "Prices belong to Head Office."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Send the April price list"
+    label: "Ines's and Theo's commits are in the history of `main`: do not force over them"
+    story: "Head Office's records are all still there."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Note the prices Kestrelby quoted"
+    label: "Your own commits are in the history of `main` too"
+    story: "And yours sit beside them."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Push, so Head Office's `main` is the same commit as your `main`"
+    story: "Head Office has the settled sheets."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Pull, and when it stops, do not open an editor yet. Walk round
+      first: which crates are held, how many places on each sheet
+      disagree, and whose delivery notes caused it.
+  - after_idle: 420s
+    text: |
+      `git status` lists every conflicted file under "Unmerged paths".
+      `grep -c '^<<<<<<<' <file>` counts the blocks in one file, or
+      watch the count in the browser.
+
+      `git log --merge --oneline` lists only the commits, from both
+      sides, that touched the conflicted files. Answer all three
+      before you resolve anything: once a file is added, it drops out
+      of both lists.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git pull
+        git status
+        grep -c '^<<<<<<<' stock/aisle-b.md suppliers/price-list.md
+        git log --merge --oneline
+
+      Answer, then edit both files: B-14 reads
+      "39 rolls counted for the stocktake.", the pallet wrap price is
+      4.45 and prices hold until 30 June. Delete every marker line.
+
+        git add stock/aisle-b.md suppliers/price-list.md
+        git commit --no-edit
+        git push

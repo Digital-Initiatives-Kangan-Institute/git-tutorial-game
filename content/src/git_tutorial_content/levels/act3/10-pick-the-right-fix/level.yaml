@@ -1,0 +1,131 @@
+id: act3-10-pick-the-right-fix
+act: 3
+level: 10
+title: Pick the right fix
+technique: loose
+teaches: []
+reuses: [restore, reset, revert, status, "log --oneline", "diff"]
+requires: [act3-09-the-wrong-bay-folded-in]
+budget_exception: >-
+  No new commands, and that is the level: three messes at once, each
+  wanting a different one of the three undos, and nothing in the brief
+  saying which is which. Choosing is the skill the act exists to
+  teach - the commands were only ever the vocabulary for it.
+first_month_moment: "Three things to put right before lunch, and they are not the same kind of wrong."
+estimated_minutes: 16
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-310
+  from: "Marta Vos, warehouse manager"
+  title: Pick the right fix
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: not
+    label: "Discard the uncommitted change to `stock/aisle-b.md`"
+    story: "The half-written B-16 line is off the clipboard."
+    assert:
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: WORKTREE
+        contains: "if you count the"
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: WORKTREE
+    contains: "40 rolls on the shelf."
+    label: "Leave the rest of `stock/aisle-b.md` as it was committed"
+    story: "The aisle B count is as it was."
+
+  - kind: not
+    label: "Discard last night's half-written section from `docs/receiving.md`"
+    story: "The returns section is gone from the procedure."
+    assert:
+      - kind: file_content
+        path: docs/receiving.md
+        at: WORKTREE
+        contains: "## Returns"
+
+  - kind: not
+    label: "Take the WIP commit out of the history of `main`"
+    story: "Last night's half-packed crate is off the line."
+    assert:
+      - kind: commit_reachable
+        from: main
+        message_matches: "WIP"
+
+  - kind: not
+    label: "Take the wrong price out of `suppliers/price-list.md` on `main`"
+    story: "Pallet wrap is back at 4.20."
+    assert:
+      - kind: file_content
+        path: suppliers/price-list.md
+        at: main
+        contains: "price = 2.40"
+
+  - kind: commit_reachable
+    from: main
+    # Anchored: unanchored, this matches the `Revert "Update the pallet
+    # wrap price"` commit, which is not what the row is checking.
+    message_matches: "^Update the pallet wrap price"
+    label: "Keep the price commit in the history: reverted, not erased"
+    story: "Head Office's records still show it, with its correction."
+
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act3-desk"
+    exactly: 3
+    label: "End with three commits: the two that were shared, and a revert"
+    story: "Two crates Head Office has, and one correction crate."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave nothing pending in the working tree"
+    story: "A clear floor before lunch."
+
+  - kind: head_on_branch
+    name: main
+    label: "Stay on the `main` branch"
+    story: "The forklift stays on the main line."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Three problems, and the only question that matters for each one
+      is how far it has got:
+
+        still on the loading floor     only in your working tree
+        sealed, still in this building committed, nobody else has it
+        sent up to Head Office         part of the shared history
+
+      `git status` and `git log --oneline` tell you which is which.
+  - after_idle: 420s
+    text: |
+      The half-typed B-16 line was never committed: `git restore` takes
+      a file back to its last committed state.
+
+      The WIP commit is the newest one and is yours alone, so `reset`
+      can move the label past it. `--hard` also discards its files,
+      which is what you want here.
+
+      The price commit is two further down and is shared, so `revert`.
+  - after_idle: 900s
+    text: |
+      One at a time:
+
+        git status
+        git restore stock/aisle-b.md
+
+        git log --oneline
+        git reset --hard HEAD~1
+
+        git revert --no-edit <the hash of the price commit>
+
+      Then read the log and `git status` once more. Three commits on
+      top of where `main` started, nothing pending.

@@ -1,0 +1,90 @@
+id: act5-05-seal-the-recount
+act: 5
+level: 5
+title: Seal the aisle B recount
+technique: loose
+teaches: []
+reuses: [diff, add, "commit -m", push, tag]
+requires: [act5-04-stale-notices]
+first_month_moment: "You tagged the release and pushed, and nobody else can see the tag."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-505
+  from: "Marta Vos, warehouse manager"
+  title: Seal the aisle B recount
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: main
+    contains: "36 rolls on the shelf."
+    label: "Commit Theo's recount in `stock/aisle-b.md` on `main`"
+    story: "The recount is booked in."
+
+  - kind: all_of
+    assert:
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: origin/main
+        contains: "36 rolls on the shelf."
+      - kind: head_office_ref
+        ref: refs/heads/main
+        exists: true
+        at: main
+    label: "Push `main`, so Head Office's `main` is your recount commit"
+    story: "Head Office has the new figure too."
+
+  - kind: tag_exists
+    name: recount-b14
+    "on": main
+    label: "Create the tag `recount-b14` on the commit that holds the recount"
+    story: "The recount is sealed."
+
+  - kind: head_office_ref
+    ref: refs/tags/recount-b14
+    exists: true
+    at: main
+    label: "Push the tag `recount-b14` to Head Office"
+    story: "And Head Office has the seal, on the same record."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Theo's figure is on the loading floor but not yet booked in, let
+      alone sealed. Read what he changed before you put your name to
+      it.
+
+      Then it is one record, sent up, with a seal on it, and the seal
+      sent up too.
+  - after_idle: 420s
+    text: |
+      `git diff` shows Theo's change. Commit it on `main`, then
+      `git push` sends the commit.
+
+      Only then tag: `git tag recount-b14` with no hash tags `HEAD`,
+      which is now your recount commit. A plain `git push` does not
+      send tags, so push it by name.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git diff
+        git add stock/aisle-b.md
+        git commit -m "Recount B-14 pallet wrap"
+        git push
+        git tag recount-b14
+        git push origin recount-b14
+        git status

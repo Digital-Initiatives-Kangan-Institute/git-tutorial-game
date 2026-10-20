@@ -1,0 +1,100 @@
+id: act2-09-two-recounts
+act: 2
+level: 9
+title: Two recounts of bin B-14
+technique: loose
+teaches: ["conflict resolution", "merge --abort"]
+reuses: [merge, status, add, "commit -m", "log --graph --all"]
+requires: [act2-08-interrupted-mid-count]
+budget_exception: >-
+  merge --abort ships in the same level as the conflict on purpose. A
+  student stuck in a conflicted state at 11pm with no exit is the worst
+  failure this course has, and the exit has to arrive with the problem
+  rather than a level later.
+first_month_moment: "Two people recorded the same thing differently."
+estimated_minutes: 18
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-209
+  from: "Marta Vos, warehouse manager"
+  title: Two recounts of bin B-14
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "The merge is finished, not paused part way"
+    story: "Inspection is over; the record is released."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is still in conflict"
+    story: "Nothing is still held at inspection."
+
+  - kind: parent_count
+    of: main
+    count: 2
+    label: "The merge commit on `main` has both branches as parents"
+    story: "One record that joins both recounts."
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: main
+    contains: "38 rolls, confirmed by a second recount."
+    label: "The agreed B-14 line is the one committed in `stock/aisle-b.md`"
+    story: "The count Marta settled on is the one in the records."
+
+  - kind: not
+    label: "No conflict markers were committed in `stock/aisle-b.md`"
+    story: "No inspection tags left stuck to the record."
+    assert:
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: main
+        contains: "<<<<<<<"
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Nothing left uncommitted in the working tree"
+    story: "Bin B-14 is settled."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Start the merge and read what git prints. A crate is held at
+      inspection: git names the file it could not settle, and
+      `git status` names it again with the way out underneath.
+  - after_idle: 420s
+    text: |
+      Git has written both versions into the file, fenced off with
+      marker lines. Your job is to edit that file until it reads the
+      way it should, markers included: they are text, and they have
+      to go.
+
+      Then it is the ordinary cycle: stage the file to say it is
+      settled, and commit.
+  - after_idle: 900s
+    text: |
+      Start it, then open the file:
+
+        git merge recount-b14
+        git status
+
+      Edit stock/aisle-b.md so the line under B-14 reads exactly:
+
+        38 rolls, confirmed by a second recount.
+
+      Delete the <<<<<<<, ======= and >>>>>>> lines as you go. Then:
+
+        git add stock/aisle-b.md
+        git commit --no-edit
+
+      If you would rather start over at any point, `git merge --abort`
+      puts the repository back as it was before you began.

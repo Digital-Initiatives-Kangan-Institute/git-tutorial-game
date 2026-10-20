@@ -1,0 +1,80 @@
+id: act4-02-read-the-bulletin
+act: 4
+level: 2
+title: Read Head Office's bulletin
+technique: loose
+teaches: [fetch]
+reuses: ["remote -v", "log --graph --all", "log --oneline", status]
+requires: [act4-01-who-is-head-office]
+first_month_moment: "Seeing what the team has done without letting it touch your work."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-402
+  from: "Ines Calder, Head Office buyer"
+  title: Read Head Office's bulletin
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: commit_reachable
+    from: "origin/main"
+    message_matches: "^Extend the Kestrelby prices to 30 April"
+    label: "Fetch, so Ines's commit shows up on `origin/main`"
+    story: "Head Office's bulletin: the supplier prices hold for another month."
+
+  - kind: ahead_behind
+    branch: main
+    upstream: origin/main
+    ahead: 0
+    behind: 1
+    label: "Leave `main` one commit behind `origin/main`: fetch does not merge"
+    story: "You have read the news. You have not acted on it yet."
+
+  - kind: not
+    label: "Keep your own `main` branch where it was: no merge, no pull"
+    story: "Your copy of the price list still says 31 March."
+    assert:
+      - kind: file_content
+        path: suppliers/price-list.md
+        at: main
+        contains: "Prices hold until 30 April"
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "Nothing on the floor has moved."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Your copy of the records only knows what Head Office said the
+      last time you asked. Ines has sent something up since, and
+      nothing in your folder has heard about it.
+
+      One command goes and reads Head Office's bulletin, and does
+      nothing else.
+  - after_idle: 420s
+    text: |
+      `git fetch` collects everything the remote has and stores it
+      under remote-tracking names like `origin/main`. Your own
+      branches do not move, and no file in your folder changes.
+
+      Afterwards, `git status` can tell you how far behind you are,
+      and `git log origin/main` shows what is waiting.
+  - after_idle: 900s
+    text: |
+      Go and look, then read what came back:
+
+        git fetch
+        git status
+        git log --oneline origin/main
+        git log --oneline --graph --all
+
+      Stop there. Do not merge or pull: this job is about the half of
+      `git pull` that only looks.

@@ -1,0 +1,84 @@
+id: act3-02-the-gate-log
+act: 3
+level: 2
+title: Read the gate log
+technique: loose
+teaches: [reflog]
+reuses: ["log --oneline", status, switch]
+requires: [act3-01-an-old-stocktake]
+first_month_moment: "A commit is missing from main and you have no idea where it went."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-302
+  from: "Marta Vos, warehouse manager"
+  title: Read the gate log
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: answer
+    id: before_reset
+    prompt: "Which commit was main on before the reset? (short hash)"
+    equals_commit: "tutorial:act3-desk"
+    label: "Find in `git reflog` the commit `main` was on before the reset"
+    story: "Where was the forklift before it backed away?"
+
+  - kind: answer
+    id: operation
+    equals: reset
+    accepts: ["reset --hard", "git reset", "git reset --hard", "reset: moving to"]
+    prompt: "Which operation moved it? (one word, as the reflog names it)"
+    label: "Name the operation the reflog says moved HEAD"
+    story: "The gate log says what kind of move it was."
+
+  - kind: head_on_branch
+    name: main
+    label: "Stay on the `main` branch"
+    story: "The forklift stays where it is."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Change nothing in the working tree: this job only reads"
+    story: "Read the log; touch nothing."
+
+  - kind: commit_count
+    from: "tutorial:act3-desk"
+    not_from: main
+    exactly: 1
+    label: "Leave the missing commit unrecovered, still off `main`"
+    story: "The crate stays out in the yard for now. Recovering it is the next job."
+
+hints:
+  - after_idle: 180s
+    text: |
+      `git log` shows the commits a branch can reach. That is the wrong
+      tool here: the commit you are looking for is a crate out in the
+      yard, and nothing points at it any more.
+
+      There is a second log, a gate log. It records where HEAD has
+      *been*.
+  - after_idle: 420s
+    text: |
+      `git reflog` prints one line per move, newest first, each with the
+      hash HEAD moved to and the operation that moved it.
+
+      Read down it until you find the reset. The line below it is where
+      you were before.
+  - after_idle: 900s
+    text: |
+      Read the trail:
+
+        git reflog
+
+      The top line is the move you are asking about and names the
+      operation. The hash on the line *below* it is where main was
+      before that move. Then answer:
+
+        wt answer before_reset <that hash>
+        wt answer operation reset

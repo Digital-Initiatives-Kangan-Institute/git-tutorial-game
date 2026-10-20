@@ -1,0 +1,80 @@
+id: act5-07-the-seal-on-the-wrong-crate
+act: 5
+level: 7
+title: The seal on the wrong crate
+technique: loose
+teaches: []
+reuses: [tag, "log --oneline", push, status]
+requires: [act5-06-tidy-after-the-fit-out]
+first_month_moment: "You tagged the wrong commit. Can a tag be moved, and is it too late?"
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-507
+  from: "Marta Vos, warehouse manager"
+  title: The seal on the wrong crate
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: tag_exists
+    name: dispatch-21-march
+    "on": "tutorial:act5-desk"
+    label: "Put the tag `dispatch-21-march` on the commit \"Log the week's dispatches\""
+    story: "The seal is on the week's dispatch log, where Marta asked for it."
+
+  - kind: head_office_ref
+    ref: refs/tags/dispatch-21-march
+    exists: true
+    at: "tutorial:act5-desk"
+    label: "Push the corrected tag, so Head Office has `dispatch-21-march` on that commit"
+    story: "Head Office gets the right seal, and never sees the wrong one."
+
+  - kind: all_of
+    assert:
+      - kind: commit_reachable
+        from: main
+        message_matches: "^Agree the April prices"
+      - kind: head_office_ref
+        ref: refs/heads/main
+        exists: true
+        at: main
+    label: "Leave `main` where it is: fixing a tag moves no commits"
+    story: "Ines's April records stay exactly as they are."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      The seal went on the newest crate, because a tag with no commit
+      named goes on HEAD. Marta wanted it on last week's dispatch log,
+      two records further down.
+
+      The good news: you have not sent it up, so only you have seen it.
+  - after_idle: 420s
+    text: |
+      `git log --oneline --decorate` shows where the tag is now. A tag
+      does not move on its own, so delete it with
+      `git tag -d dispatch-21-march` and make it again on the right
+      commit, named by its hash.
+
+      Then push the tag by name. Because the wrong one never left your
+      repository, nobody else has to be told.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git log --oneline --decorate -n 4
+        git tag -d dispatch-21-march
+        git tag dispatch-21-march <hash of "Log the week's dispatches">
+        git log --oneline --decorate -n 4
+        git push origin dispatch-21-march

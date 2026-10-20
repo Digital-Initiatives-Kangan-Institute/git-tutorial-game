@@ -1,0 +1,89 @@
+id: act2-10-back-out-of-the-merge
+act: 2
+level: 10
+title: Back out of a merge
+technique: loose
+teaches: []
+reuses: ["merge --abort", "conflict resolution", merge, status, "log --graph --all"]
+requires: [act2-09-two-recounts]
+budget_exception: >-
+  No new commands. The escape hatch from 2.9 used on its own, from a
+  repository that is already mid-conflict when the student arrives -
+  which is how it actually happens.
+first_month_moment: "You are halfway through a merge and no longer sure you should be."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-210
+  from: "Marta Vos, warehouse manager"
+  title: Back out of a merge
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "No merge is paused any more"
+    story: "Nothing is waiting at inspection."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is left in conflict"
+    story: "Every hold is cleared."
+
+  - kind: parent_count
+    of: main
+    count: 1
+    label: "No merge commit was made: you backed out with `git merge --abort`"
+    story: "You sent it back rather than pushing it through."
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: main
+    contains: "after the Fennick order"
+    label: "`main` still says what it said before the merge started"
+    story: "The main record of B-14 is as Theo left it."
+
+  - kind: not
+    label: "No conflict markers left in `stock/aisle-b.md` in the working tree"
+    story: "No inspection tags left on anything."
+    assert:
+      - kind: file_content
+        path: stock/aisle-b.md
+        contains: "<<<<<<<"
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "A clean working tree, as though the merge never started"
+    story: "The floor looks as it did before anyone began."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Run `git status` first. Somebody left a crate held at
+      inspection: you are standing in the middle of something you did
+      not start, and git says so, along with what can be done about it.
+  - after_idle: 420s
+    text: |
+      You met the way out in the last job. It is a flag on the merge
+      command, and it undoes the whole attempt rather than any one
+      file.
+
+      This job wants the merge undone, not finished.
+  - after_idle: 900s
+    text: |
+      Look at what is going on, then back out:
+
+        git status
+        git merge --abort
+        git status
+        git log --oneline --graph --all
+
+      The markers are gone, main says what it said before, and the
+      recount-b14 branch is untouched and still there.

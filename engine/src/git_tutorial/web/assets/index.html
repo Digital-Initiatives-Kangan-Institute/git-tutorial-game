@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="wt-token" content="__WT_TOKEN__">
+<title>Tallowmere Distribution · git-tutorial</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='4' width='12' height='10' fill='%23c8955a' stroke='%238a5f31'/%3E%3Crect x='7' y='4' width='2' height='4' fill='%23e7c79a'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="mark" aria-hidden="true"></span>
+    <span class="company">Tallowmere Distribution</span>
+    <span class="product">git-tutorial</span>
+  </div>
+  <nav class="actmap" id="actmap" aria-label="Course progress"></nav>
+  <span class="live" id="live" role="status">connecting</span>
+</header>
+
+<main class="layout">
+  <section class="panel" id="panel" aria-label="Your job">
+    <article class="jobcard" id="jobcard"></article>
+    <section class="sheet" aria-labelledby="sheet-title">
+      <h2 id="sheet-title">Job sheet</h2>
+      <ol class="goals" id="goals" aria-live="polite"></ol>
+    </section>
+    <section class="hints" aria-labelledby="hints-title">
+      <div class="hints-head">
+        <h2 id="hints-title">Hints</h2>
+        <button type="button" id="hint-button" class="secondary">Ask for a hint</button>
+      </div>
+      <ol class="hint-list" id="hint-list" aria-live="polite"></ol>
+    </section>
+    <details class="reference" id="reference">
+      <summary>Reference card for this job</summary>
+      <div id="brief"></div>
+    </details>
+    <details class="reference" id="glossary-box">
+      <summary>Glossary: the git terms so far</summary>
+      <dl id="glossary"></dl>
+    </details>
+    <div class="panel-foot">
+      <button type="button" id="reset-button" class="quiet">Restart this job</button>
+    </div>
+  </section>
+
+  <section class="floor" aria-label="The warehouse: your repository and Head Office">
+    <div id="caption" class="caption" aria-live="polite">
+      <span class="tag">waiting</span>
+      <span class="detail">Run a git command in your terminal and watch it happen here.</span>
+    </div>
+    <div id="stage" class="stage"></div>
+    <p class="legend">
+      <b>Every label is the real git name.</b> The warehouse is only the picture:
+      crate = commit, shelf = branch, forklift = HEAD, packing bench = staging area,
+      Head Office = origin.
+    </p>
+  </section>
+</main>
+
+<div class="stamp-backdrop" id="stamp" hidden>
+  <div class="stamp-card" role="dialog" aria-modal="true" aria-labelledby="stamp-title">
+    <div class="stamp-mark" aria-hidden="true">JOB COMPLETE</div>
+    <h2 id="stamp-title"></h2>
+    <div id="stamp-body" class="prose"></div>
+    <p class="learned" id="stamp-learned"></p>
+    <div class="stamp-actions">
+      <button type="button" id="next-button" class="primary">Start the next job</button>
+      <button type="button" id="stay-button" class="secondary">Look around first</button>
+    </div>
+  </div>
+</div>
+<div class="done-bar" id="done-bar" hidden>
+  <span>Job complete.</span>
+  <button type="button" id="next-button-2" class="primary">Start the next job</button>
+</div>
+<div class="toast" id="toast" role="alert" hidden></div>
+<div class="offline" id="offline" hidden>The watcher has stopped. Run <code>wt</code> in your workspace again.</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

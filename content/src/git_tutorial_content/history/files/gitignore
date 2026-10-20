@@ -1,0 +1,4 @@
+# Files that are not part of Tallowmere's records.
+#
+# Git stops reporting anything listed here. Nothing is deleted:
+# ignored files stay on disk, git just stops mentioning them.

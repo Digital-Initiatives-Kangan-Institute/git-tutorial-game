@@ -1,0 +1,87 @@
+id: act4-03-send-your-bay-up
+act: 4
+level: 3
+title: Send your bay up to Head Office
+technique: loose
+teaches: [push]
+reuses: ["switch -c", "commit -m", status, branch, add]
+requires: [act4-02-read-the-bulletin]
+first_month_moment: "Your work is finished and nobody else can see it."
+estimated_minutes: 14
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-403
+  from: "Ines Calder, Head Office buyer"
+  title: Send your bay up to Head Office
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: branch_exists
+    name: count-b15
+    label: "Create a branch called `count-b15` for the work"
+    story: "A bay of its own for the carton count."
+
+  - kind: file_content
+    path: stock/aisle-b.md
+    at: count-b15
+    contains: "12 bundles in stock."
+    label: "Commit the B-15 count to `stock/aisle-b.md` on `count-b15`"
+    story: "Twelve bundles of double-wall cartons, counted and booked in."
+
+  - kind: remote_ref_at
+    remote: origin
+    branch: count-b15
+    equals: count-b15
+    label: "Push `count-b15` so origin has exactly the commit you have"
+    story: "Head Office holds the same count you do."
+
+  - kind: tracks
+    branch: count-b15
+    upstream: origin/count-b15
+    label: "Set the upstream with `push -u`, so a bare `git push` works next time"
+    story: "The bay knows which Head Office line it reports to."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean: nothing uncommitted"
+    story: "Nothing left lying about."
+
+hints:
+  - after_idle: 180s
+    text: |
+      The work first, sending it up second. A bay of its own, the count
+      written into the aisle B sheet, and a booking: all of that you
+      have done before, and none of it leaves your folder.
+
+      Then one new command sends the branch to Head Office.
+  - after_idle: 420s
+    text: |
+      `git push -u origin count-b15` sends the branch and records where
+      it belongs, so later pushes from this branch can be plain
+      `git push`.
+
+      Without `-u` the push still works and the branch still arrives;
+      you are just left typing the remote and the branch every time.
+  - after_idle: 900s
+    text: |
+      All of it, in order:
+
+        git switch -c count-b15
+
+      In `stock/aisle-b.md`, replace `Not counted yet.` under B-15
+      with:
+
+        12 bundles in stock.
+
+      Then:
+
+        git add stock/aisle-b.md
+        git commit -m "Count the B-15 cartons"
+        git push -u origin count-b15
+        git status

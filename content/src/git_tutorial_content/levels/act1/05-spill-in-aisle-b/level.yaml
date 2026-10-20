@@ -1,0 +1,80 @@
+id: act1-05-spill-in-aisle-b
+act: 1
+level: 5
+title: Clean up a spill
+technique: loose
+teaches: [restore, "restore --staged"]
+reuses: [status, diff, "diff --staged"]
+requires: [act1-04-finish-the-dispatch-note]
+first_month_moment: "Undoing a mess before you have committed it."
+estimated_minutes: 15
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-105
+  from: "Theo Banda, stock controller"
+  title: Clean up a spill
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: branch_at
+    name: main
+    commit: "tutorial:act1-desk"
+    label: "Leave `main` on the commit it started at: undo, do not commit over it"
+    story: "Clean the spill up; do not book it in."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave nothing staged and nothing changed in the working tree"
+    story: "Floor swept, bench cleared."
+
+  - kind: not
+    label: "Restore `stock/aisle-b.md` so the unstaged note is gone"
+    story: "The scribble on the aisle B sheet is wiped off."
+    assert:
+      - kind: file_content
+        path: stock/aisle-b.md
+        at: WORKTREE
+        contains: "TODO recount all of this"
+
+  - kind: file_content
+    path: suppliers/price-list.md
+    at: WORKTREE
+    contains: "Prices hold until 31 March"
+    label: "Restore `suppliers/price-list.md` to its last committed version"
+    story: "The price list reads as Ines left it."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Nothing here has been booked in, so every change is still
+      somewhere git is willing to throw away. One mess is on the
+      loading floor; the other made it as far as the packing bench.
+      The question is which is where.
+  - after_idle: 420s
+    text: |
+      There are three copies of every file:
+
+        the last commit       what is recorded
+        the staging area      what is staged for the next commit
+        the working tree      the file as it is on disk right now
+
+      One command moves a copy down each step of that ladder, and
+      both of them are `git restore`: the difference is a flag.
+      `git status` is already printing both, with your filenames
+      filled in. Read what it says under each heading.
+  - after_idle: 900s
+    text: |
+      The aisle B change was never staged, so one command:
+
+        git restore stock/aisle-b.md
+
+      The price list change is staged as well, so it needs both:
+
+        git restore --staged suppliers/price-list.md
+        git restore suppliers/price-list.md

@@ -1,0 +1,106 @@
+id: act6-05-the-sheet-ines-retired
+act: 6
+level: 5
+title: The sheet Ines retired
+technique: loose
+teaches: [rm]
+reuses: [pull, status, "commit -m", push]
+requires: [act6-04-keep-your-scanner-count]
+first_month_moment: "CONFLICT (modify/delete): you changed a file somebody else deleted."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-605
+  from: "Ines Calder, Head Office buyer"
+  title: The sheet Ines retired
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: in_progress
+    op: MERGE_HEAD
+    expected: false
+    label: "Finish the merge `git pull` started: no merge left in progress"
+    story: "Inspection is over."
+
+  - kind: conflicted
+    expected: false
+    label: "No file is still in conflict"
+    story: "Nothing is still held."
+
+  - kind: no_conflict_markers
+    at: main
+    label: "No conflict markers committed anywhere on `main`"
+    story: "No inspection tags left on the records."
+
+  - kind: all_of
+    assert:
+      - kind: file_absent
+        path: docs/opening-checks.md
+        at: main
+      - kind: file_absent
+        path: docs/opening-checks.md
+    label: "`docs/opening-checks.md` is deleted with `git rm`: gone from `main` and from the working tree"
+    story: "The sheet is off the books, as Ines retired it."
+
+  - kind: file_content
+    path: README.md
+    at: main
+    contains: "see the Head Office site handbook"
+    label: "Ines's README change is committed on `main`: it points at the site handbook"
+    story: "The noticeboard points at the handbook now."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Retire the opening checks sheet"
+    label: "Ines's commit is in the history of `main`: do not force over it"
+    story: "Ines's retirement is on the record."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Add the first-aid box to the opening checks"
+    label: "Your own commit is in the history of `main` too"
+    story: "So is your edit, even though the sheet has gone."
+
+  - kind: head_office_ref
+    ref: refs/heads/main
+    exists: true
+    at: main
+    label: "Push, so Head Office's `main` is the same commit as your `main`"
+    story: "Head Office has it."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Pull, and read the CONFLICT line carefully. It is not two counts
+      this time: one side changed the sheet, the other took it off the
+      books. Ines has said which side wins.
+  - after_idle: 420s
+    text: |
+      `git status` shows the file as "deleted by them". There are no
+      markers to edit, because there is no second version to put them
+      in.
+
+      To agree with the deletion, delete it yourself with
+      `git rm <path>`. That removes the file and stages the removal in
+      one step, which also settles the conflict. Then commit.
+  - after_idle: 900s
+    text: |
+      In order:
+
+        git pull
+        git status
+        git rm docs/opening-checks.md
+        git status
+        git commit --no-edit
+        git push

@@ -1,0 +1,52 @@
+{
+  "c01-initial": {
+    "sha": "5e4d2cafcd262f14c0d6469df2e631e7ad091504",
+    "short": "5e4d2ca",
+    "subject": "Initial commit"
+  },
+  "c02-hours": {
+    "sha": "a55ddbc9640753571f41eb64e955611ed69b4e4b",
+    "short": "a55ddbc",
+    "subject": "Add the receiving hours"
+  },
+  "c03-log": {
+    "sha": "62f7e97f13baa5408536850a6e712d2c0969df22",
+    "short": "62f7e97",
+    "subject": "Start the dispatch log"
+  },
+  "c04-prices": {
+    "sha": "2e5320ec0765110575a1b19b7559a038e4d3d16d",
+    "short": "2e5320e",
+    "subject": "Add the supplier price list"
+  },
+  "c05-phone": {
+    "sha": "6f00ff28d4a1971c17ab21eb7f505194c7858802",
+    "short": "6f00ff2",
+    "subject": "Add the yard phone number"
+  },
+  "c06-receiving": {
+    "sha": "7f24b183b5a33da7646bb32655528bdbc2acd7e5",
+    "short": "7f24b18",
+    "subject": "Write up the receiving procedure"
+  },
+  "c07-validity": {
+    "sha": "cacaca4b41a33f48ecfb59fc1e07ddec837f6c48",
+    "short": "cacaca4",
+    "subject": "Say how long the prices hold"
+  },
+  "c08-aisle-b": {
+    "sha": "dfd4b1f68f1384ffed2d8ee9f12a3989e49e3b0c",
+    "short": "dfd4b1f",
+    "subject": "Count aisle B"
+  },
+  "c09-note": {
+    "sha": "d928a22420d9bde374f89137358903f62db0caee",
+    "short": "d928a22",
+    "subject": "Start the dispatch note for 3 March"
+  },
+  "c10-week": {
+    "sha": "ed0c3416eebc29dfa3d20c80c6b304f3bf18cad7",
+    "short": "ed0c341",
+    "subject": "Log the week's dispatches"
+  }
+}

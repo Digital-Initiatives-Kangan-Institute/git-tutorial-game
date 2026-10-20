@@ -1,0 +1,70 @@
+id: act1-04-finish-the-dispatch-note
+act: 1
+level: 4
+title: Finish the 3 March dispatch note
+technique: loose
+teaches: []
+reuses: [status, diff, add, "commit -m"]
+requires: [act1-03-check-before-booking]
+budget_exception: >-
+  No new commands. The work is finishing a note someone else left open,
+  which happens to need everything the act has taught so far.
+first_month_moment: "Picking up a task someone else left half-done."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-104
+  from: "Marta Vos, warehouse manager"
+  title: Finish the 3 March dispatch note
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: file_content
+    path: dispatch/2025-03-03.md
+    at: main
+    matches: 'the third one is\s+\S'
+    label: "Finish the sentence in `dispatch/2025-03-03.md` and commit it"
+    story: "The carrier gets a note that says what the third pallet is."
+
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act1-desk"
+    exactly: 1
+    label: "Make one commit, not three attempts"
+    story: "One clean record for one finished note."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave nothing staged or changed in the working tree"
+    story: "Nothing left half-done on the floor."
+
+hints:
+  - after_idle: 180s
+    text: |
+      The dispatch note for 3 March stops mid-sentence, and the carrier
+      is waiting. Open it, finish the sentence, and then do what you
+      already know how to do with a changed file.
+  - after_idle: 420s
+    text: |
+      Edit the file in your editor and save. Anything that completes
+      the sentence is fine.
+
+      Then it is the same two steps as before, with a look first:
+
+        git diff    read what you changed
+        git add     stage it
+        git commit  record it
+  - after_idle: 900s
+    text: |
+      Open dispatch/2025-03-03.md and write an ending after
+      "the third one is". Save it, then:
+
+        git diff
+        git add dispatch/2025-03-03.md
+        git commit -m "Finish the 3 March dispatch note"

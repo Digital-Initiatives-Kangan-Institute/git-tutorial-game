@@ -1,0 +1,73 @@
+id: act1-02-book-in-the-safety-sheet
+act: 1
+level: 2
+title: Book in the safety sheet
+technique: loose
+teaches: [add, "commit -m"]
+reuses: [status, "log --oneline"]
+requires: [act1-01-shift-handover]
+first_month_moment: "Your first commit on a real codebase."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-102
+  from: "Marta Vos, warehouse manager"
+  title: Book in the safety sheet
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: head_on_branch
+    name: main
+    label: "Stay on the `main` branch"
+    story: "Book it in on the main line, where everyone will look for it."
+
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act1-desk"
+    exactly: 1
+    label: "Make exactly one new commit"
+    story: "One sheet, one record."
+
+  - kind: file_content
+    path: docs/safety.md
+    at: main
+    contains: "Hi-vis on at all times"
+    label: "Commit `docs/safety.md` so it is in the history"
+    story: "The safety sheet is booked in for everyone to read."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave nothing staged or uncommitted in the working tree"
+    story: "Nothing left lying about once the sheet is booked."
+
+hints:
+  - after_idle: 180s
+    text: |
+      The safety sheet is lying on the loading floor, and `git status`
+      can see it, but nobody has booked it in yet. `git status`
+      tells those two states apart, and names the two commands that
+      move a file from one to the other.
+  - after_idle: 420s
+    text: |
+      Two commands, in this order:
+
+        git add     stages the file: marks it to go in the next commit
+        git commit  records everything staged as one commit
+
+      Run `git status` between them and read what changes.
+  - after_idle: 900s
+    text: |
+      Run these, in order:
+
+        git add docs/safety.md
+        git status
+        git commit -m "Add the safety sheet"
+
+      The text after -m is the commit message. It goes into the history
+      for other people to read, so write it for them.

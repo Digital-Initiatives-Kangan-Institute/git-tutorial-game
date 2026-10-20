@@ -1,0 +1,80 @@
+id: act2-07-keep-both-jobs
+act: 2
+level: 7
+title: A merge that keeps both jobs
+technique: loose
+teaches: []
+reuses: [merge, "log --graph --all", switch, status]
+requires: [act2-06-fold-in-the-fit-out]
+budget_exception: >-
+  No new commands. The same merge against the shape that actually needs
+  one, which is the only way the merge commit stops being a mystery.
+first_month_moment: "Someone else committed to main while your branch was open."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-207
+  from: "Marta Vos, warehouse manager"
+  title: A merge that keeps both jobs
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: head_on_branch
+    name: main
+    label: "Be on `main` at the end"
+    story: "Finish at the main line."
+
+  - kind: parent_count
+    of: main
+    count: 2
+    label: "`main`'s newest commit is a merge commit, with two parents"
+    story: "A new record that joins the two lines."
+
+  - kind: commit_reachable
+    from: main
+    contains_file: docs/racking-checks.md
+    label: "`docs/racking-checks.md` came into `main` with the merge"
+    story: "Your checklist is in the main records."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "Fennick order dispatched"
+    label: "Theo's commit to `dispatch/log.md` is still on `main` too"
+    story: "Theo's dispatch entry is still there beside it."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "The merge is finished: nothing uncommitted in the working tree"
+    story: "Nothing half-done left lying about."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Draw the floor plan first. It is not the same picture as last
+      job: both shelf lines have records on them now, so there is no
+      name git can just slide forward.
+  - after_idle: 420s
+    text: |
+      The command is the same one, in the same direction: stand on the
+      branch that receives, name the branch that has the work.
+
+      What changes is what git has to do. It cannot move a name, so it
+      makes a new commit instead, and it may open an editor asking you
+      to confirm the message.
+  - after_idle: 900s
+    text: |
+      From where you are:
+
+        git switch main
+        git merge racking-checks --no-edit
+        git log --oneline --graph --all
+
+      Without `--no-edit` an editor opens with the message git wrote;
+      save and close it to accept.

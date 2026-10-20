@@ -1,0 +1,143 @@
+# The canonical command vocabulary.
+#
+# Every id a level names in `teaches` or `reuses` must appear here, and the
+# tiers drive how hard each one is drilled:
+#
+#   1  must be automatic          performed in >= 3 spaced levels
+#   2  will hit these in month 1  performed in >= 3 spaced levels
+#   3  recognise, do not drill    taught at most once, never drilled
+#   cut  must appear nowhere at all
+#
+# Spec 3.1 lists the tiers; spec 3.7's coverage rule is superseded by the
+# three-times rule recorded in the plan.
+
+commands:
+  # -- tier 1 ---------------------------------------------------------------
+  - id: status
+    tier: 1
+  - id: add
+    tier: 1
+  - id: commit -m
+    tier: 1
+    aliases: [commit]
+  - id: log --oneline
+    tier: 1
+    # Spec 3.1 treats the short form as one vocabulary entry with plain `log`.
+    # Level 1.1 needs both: --oneline to count commits, plain log for authors.
+    aliases: [log]
+  - id: diff
+    tier: 1
+  - id: switch
+    tier: 1
+  - id: switch -c
+    tier: 1
+  - id: merge
+    tier: 1
+  - id: branch
+    tier: 1
+  - id: clone
+    tier: 1
+  - id: push
+    tier: 1
+  - id: pull
+    tier: 1
+
+  # -- tier 2 ---------------------------------------------------------------
+  - id: restore
+    tier: 2
+  - id: restore --staged
+    tier: 2
+  - id: diff --staged
+    tier: 2
+  - id: .gitignore
+    tier: 2
+  - id: stash
+    tier: 2
+  - id: stash pop
+    tier: 2
+  - id: log --graph --all
+    tier: 2
+    aliases: ["log --graph"]
+  - id: merge --abort
+    tier: 2
+  - id: conflict resolution
+    tier: 2
+  - id: reflog
+    tier: 2
+  - id: reset
+    tier: 2
+    aliases: ["reset --soft", "reset --mixed", "reset --hard"]
+  - id: revert
+    tier: 2
+  - id: fetch
+    tier: 2
+  - id: remote -v
+    tier: 2
+  # Act 5: the team loop at Head Office.
+  - id: tag
+    tier: 2
+    aliases: ["tag -d", "tag -a"]
+  - id: branch -d
+    tier: 2
+    aliases: ["branch --delete"]
+  - id: push --delete
+    tier: 2
+    aliases: ["push origin --delete"]
+  - id: fetch --prune
+    tier: 2
+    aliases: ["fetch -p"]
+  # Act 6: conflicts with the team.
+  - id: log --merge
+    tier: 2
+  - id: restore --theirs
+    tier: 2
+    aliases: ["restore --ours", "checkout --theirs", "checkout --ours"]
+  - id: rm
+    tier: 2
+    aliases: ["rm --cached"]
+
+  # -- tier 3: recognise, do not drill --------------------------------------
+  # Spec 3.1 demotes these deliberately. Drilling rebase with beginners
+  # produces the confident-but-wrong behaviour this game exists to prevent.
+  - id: rebase
+    tier: 3
+  - id: cherry-pick
+    tier: 3
+  - id: push --force-with-lease
+    tier: 3
+  - id: show
+    tier: 3
+  - id: blame
+    tier: 3
+  # Spec 3.1: `switch`/`restore` are what the game teaches, but every answer
+  # a student finds online will say `checkout`. Act 3 has the one beat where
+  # it appears and is explained as the old tool that did both jobs.
+  - id: checkout
+    tier: 3
+
+# Never taught, never mentioned. The coverage lint greps prose and solution
+# scripts for these, not just the level metadata.
+cut:
+  - bisect
+  - rebase -i
+  - rebase --interactive
+  - submodule
+  - worktree
+  - filter-branch
+
+# Commands whose three performances land outside acts 1-2, with the reason.
+# The coverage lint reads this so a deliberate deferral is a declaration
+# rather than a lint it has to be taught to ignore.
+deferred:
+
+# Commands the three-times rule cannot sensibly apply to, with the reason.
+# An exemption is a curriculum decision and has to be argued for in writing,
+# which is the difference between this and deleting the lint.
+exempt:
+  clone:
+    why: >-
+      You clone a repository once. The quest itself is a clone, 4.1 makes a
+      second one to show what a new teammate gets, and a third would be a
+      folder created to satisfy a counter. Everything a student does with
+      the result - fetch, push, pull, branch - is drilled to the full three
+      and beyond.

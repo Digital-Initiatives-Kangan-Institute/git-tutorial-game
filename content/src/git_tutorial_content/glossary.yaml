@@ -1,0 +1,244 @@
+# The glossary the browser shows, and the content lint checks against.
+#
+# The key is the git term (for commands, the id in commands.yaml). The
+# `warehouse` line is the picture only: it says where the thing is drawn,
+# never what to type. `level` is the job that introduces the term; the
+# browser lists a term once the student has reached that job.
+
+# ---- concepts ----------------------------------------------------------------
+
+repository:
+  command: repository
+  definition: "A folder plus the complete history of every change made to it."
+  warehouse: "the whole warehouse, with every record it has ever booked"
+  level: act1-01-shift-handover
+commit:
+  command: commit
+  definition: "One saved change: a snapshot with a message, an author and a unique hash."
+  warehouse: "a sealed crate on a shelf, stamped with its hash"
+  level: act1-01-shift-handover
+working tree:
+  command: working tree
+  definition: "The files on disk as you are editing them right now."
+  warehouse: "the loading floor"
+  level: act1-02-book-in-the-safety-sheet
+staging area:
+  command: staging area
+  definition: "What the next commit will contain. `git add` puts changes here."
+  warehouse: "the packing bench"
+  level: act1-02-book-in-the-safety-sheet
+HEAD:
+  command: HEAD
+  definition: "The commit you are on: usually the newest commit of the current branch."
+  warehouse: "the forklift"
+  level: act2-01-open-a-job-bay
+origin:
+  command: origin
+  definition: "The usual name for the remote repository this one was cloned from."
+  warehouse: "Head Office"
+  level: act4-01-who-is-head-office
+remote-tracking branch:
+  command: origin/main
+  definition: "Your copy of a branch on the remote, as it was at your last fetch."
+  warehouse: "Head Office's shelf, as you last saw it"
+  level: act4-02-read-the-bulletin
+unreachable commit:
+  command: unreachable commit
+  definition: "A commit no branch points at. The reflog still records it for a while."
+  warehouse: "a crate out in the yard"
+  level: act3-02-the-gate-log
+
+# ---- commands (ids match commands.yaml) -------------------------------------
+
+status:
+  command: git status
+  definition: "Which branch you are on, and what has changed since the last commit."
+  warehouse: "a walk round the floor and the bench"
+  level: act1-01-shift-handover
+log --oneline:
+  command: git log --oneline
+  definition: "The commits on this branch, newest first, one line each."
+  warehouse: "reading the labels on a shelf"
+  level: act1-01-shift-handover
+add:
+  command: git add
+  definition: "Stage a change: put it in the staging area, ready for the next commit."
+  warehouse: "carry a sheet from the floor to the packing bench"
+  level: act1-02-book-in-the-safety-sheet
+commit -m:
+  command: git commit -m
+  definition: "Record everything staged as a new commit, with the message you give."
+  warehouse: "seal what is on the bench into a crate and shelve it"
+  level: act1-02-book-in-the-safety-sheet
+diff:
+  command: git diff
+  definition: "Changes in the working tree that are not staged yet."
+  warehouse: "what is on the floor but not yet on the bench"
+  level: act1-03-check-before-booking
+diff --staged:
+  command: git diff --staged
+  definition: "Changes that are staged: exactly what the next commit will record."
+  warehouse: "what is on the bench"
+  level: act1-03-check-before-booking
+restore:
+  command: git restore
+  definition: "Throw away unstaged changes to a file, back to its last committed version."
+  warehouse: "sweep the floor back to how it was"
+  level: act1-05-spill-in-aisle-b
+restore --staged:
+  command: git restore --staged
+  definition: "Unstage a file. Its changes stay in the working tree."
+  warehouse: "take a sheet off the bench, back onto the floor"
+  level: act1-05-spill-in-aisle-b
+.gitignore:
+  command: .gitignore
+  definition: "A file listing names and patterns git should stop reporting."
+  warehouse: "a sign telling the stock checker what to walk past"
+  level: act1-06-scanner-dumps
+branch:
+  command: git branch
+  definition: "List branches, or create one. A branch is a movable name for a line of commits."
+  warehouse: "a shelf line of its own"
+  level: act2-01-open-a-job-bay
+switch -c:
+  command: git switch -c
+  definition: "Create a branch and move onto it in one step."
+  warehouse: "put up a new shelf and drive the forklift to it"
+  level: act2-01-open-a-job-bay
+switch:
+  command: git switch
+  definition: "Move to another branch. Your working tree changes to match it."
+  warehouse: "drive the forklift to another shelf"
+  level: act2-02-between-bays
+log --graph --all:
+  command: git log --graph --all
+  definition: "Every branch's commits at once, drawn as a graph."
+  warehouse: "the whole floor plan, every shelf"
+  level: act2-03-see-the-whole-floor
+stash:
+  command: git stash
+  definition: "Put uncommitted changes aside and clean the working tree."
+  warehouse: "push the half-done work into the back room"
+  level: act2-04-rush-order
+stash pop:
+  command: git stash pop
+  definition: "Bring the most recently stashed changes back, and drop them from the stash."
+  warehouse: "fetch the work back out of the back room"
+  level: act2-04-rush-order
+merge:
+  command: git merge
+  definition: "Bring another branch's commits into the current branch."
+  warehouse: "fold another shelf's crates into this line"
+  level: act2-06-fold-in-the-fit-out
+conflict resolution:
+  command: conflict resolution
+  definition: "When two branches changed the same lines, you choose the final text, then add and commit it."
+  warehouse: "a crate held at inspection until someone decides"
+  level: act2-09-two-recounts
+merge --abort:
+  command: git merge --abort
+  definition: "Give up a merge that stopped on a conflict, and go back to before it."
+  warehouse: "send the held crate back and clear inspection"
+  level: act2-09-two-recounts
+checkout:
+  command: git checkout
+  definition: "Older command that switches branches or moves HEAD to any commit."
+  warehouse: "drive the forklift to any crate, even one on no shelf's end"
+  level: act3-01-an-old-stocktake
+reflog:
+  command: git reflog
+  definition: "A log of everywhere HEAD has been, including commits no branch points at."
+  warehouse: "the gate log: every move the forklift made"
+  level: act3-02-the-gate-log
+reset:
+  command: git reset
+  definition: "Move the current branch back to an earlier commit. --hard also discards changes."
+  warehouse: "take crates back off the end of a shelf"
+  level: act3-04-booked-in-too-early
+revert:
+  command: git revert
+  definition: "Make a new commit that undoes an earlier one, without rewriting history."
+  warehouse: "a correction crate that cancels an old one"
+  level: act3-07-already-sent-up
+clone:
+  command: git clone
+  definition: "Copy a whole repository, history and all, and remember where it came from."
+  warehouse: "build your warehouse as a copy of Head Office's"
+  level: act4-01-who-is-head-office
+remote -v:
+  command: git remote -v
+  definition: "List the remotes this repository knows, with their addresses."
+  warehouse: "Head Office's address on the noticeboard"
+  level: act4-01-who-is-head-office
+fetch:
+  command: git fetch
+  definition: "Download what the remote has. Updates origin/main; changes none of your branches."
+  warehouse: "read Head Office's bulletin"
+  level: act4-02-read-the-bulletin
+push:
+  command: git push
+  definition: "Send your commits to the remote branch."
+  warehouse: "send crates up to Head Office"
+  level: act4-03-send-your-bay-up
+pull:
+  command: git pull
+  definition: "Fetch, then merge the remote branch into yours."
+  warehouse: "read the bulletin and shelve its crates"
+  level: act4-04-take-the-updates
+push --force-with-lease:
+  command: git push --force-with-lease
+  definition: "Overwrite the remote branch, but only if nobody has pushed since you last fetched."
+  warehouse: "replace Head Office's shelf, only if it is as you last saw it"
+  level: act4-09-the-refused-force
+
+# ---- act 5 --------------------------------------------------------------------
+
+tag:
+  command: git tag
+  definition: "A fixed name for one commit, such as a signed-off stocktake. Unlike a branch, it never moves."
+  warehouse: "a seal on one crate"
+  level: act5-02-seal-the-stocktake
+branch -d:
+  command: git branch -d
+  definition: "Delete a branch name once its work is merged. The commits stay; only the name goes."
+  warehouse: "take down a shelf line that has been folded in"
+  level: act5-03-ines-merged-your-rota
+push --delete:
+  command: git push origin --delete
+  definition: "Delete a branch on the remote."
+  warehouse: "ask Head Office to take down a shelf line"
+  level: act5-03-ines-merged-your-rota
+fetch --prune:
+  command: git fetch --prune
+  definition: "Fetch, and also remove origin/* names for branches the remote has deleted."
+  warehouse: "take down notices for shelves Head Office has cleared"
+  level: act5-04-stale-notices
+
+# ---- act 6 --------------------------------------------------------------------
+
+log --merge:
+  command: git log --merge
+  definition: "During a conflict, the commits on each side that touched the conflicted files."
+  warehouse: "the two delivery notes that disagree"
+  level: act6-02-read-before-you-fix
+restore --theirs:
+  command: git restore --theirs
+  definition: "During a conflict, take the other side's version of a file whole (--ours takes yours). Then add it."
+  warehouse: "accept one count and bin the other"
+  level: act6-03-head-office-prices-win
+rm:
+  command: git rm
+  definition: "Delete a file and stage the deletion. With --cached, stop tracking it but keep it on disk."
+  warehouse: "take a sheet off the books"
+  level: act6-05-the-sheet-ines-retired
+ours and theirs:
+  command: ours / theirs
+  definition: "In a conflict, ours is the branch you are on; theirs is the one being merged in (after git pull, Head Office's)."
+  warehouse: "your count, and the count from Head Office"
+  level: act6-03-head-office-prices-win
+modify/delete conflict:
+  command: modify/delete conflict
+  definition: "One side changed a file the other side deleted. Keep it (git add) or delete it (git rm)."
+  warehouse: "a sheet one person updated and another threw out"
+  level: act6-05-the-sheet-ines-retired
+

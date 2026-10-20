@@ -1,0 +1,90 @@
+id: act3-08-correct-the-correction
+act: 3
+level: 8
+title: Correct the correction
+technique: loose
+teaches: []
+reuses: [revert, "log --oneline", "log --graph --all", diff, status]
+requires: [act3-07-already-sent-up]
+budget_exception: >-
+  No new commands. Reverting a revert is the shortest proof that a
+  revert is an ordinary commit and the history is append-only - a
+  student who has only reverted a mistake still half-believes the
+  command deletes something.
+first_month_moment: "The thing you took out last week is going in after all."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-308
+  from: "Marta Vos, warehouse manager"
+  title: Correct the correction
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: file_content
+    path: suppliers/price-list.md
+    at: main
+    contains: "10% off any order over 50 rolls"
+    label: "Bring the bulk discount back into `suppliers/price-list.md` on `main`"
+    story: "The discount is back on the price list."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: main
+    contains: "- Bulk discount recorded."
+    label: "Leave the line in `dispatch/log.md` as it was"
+    story: "The log line never moved."
+
+  - kind: commit_count
+    from: main
+    not_from: "tutorial:act3-desk"
+    exactly: 4
+    label: "End with four commits: nothing removed from the history to get here"
+    story: "Four crates on the line, none taken off."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Add the Kestrelby bulk discount"
+    label: "Keep the original commit in the history of `main`"
+    story: "The first record of the discount is still there."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Revert"
+    label: "Keep the revert that took it out, too"
+    story: "So is the correction that took it out."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Commit the work, leaving the working tree clean"
+    story: "Booked in, not sitting on the bench."
+
+hints:
+  - after_idle: 180s
+    text: |
+      You could open the price list and type the discount back in. Do
+      not: the repository already holds it twice over, once in the
+      original crate and once as the thing last week's correction crate
+      took away.
+  - after_idle: 420s
+    text: |
+      A revert is an ordinary commit. It changed some lines, and you
+      know a command that undoes what one commit changed.
+
+      Point it at the revert.
+  - after_idle: 900s
+    text: |
+      Find the revert and revert it:
+
+        git log --oneline
+        git revert --no-edit <the hash of the Revert commit>
+
+      The discount comes back, and the log holds all three steps: the
+      discount, its removal, and its return. That is the honest record
+      of what happened.

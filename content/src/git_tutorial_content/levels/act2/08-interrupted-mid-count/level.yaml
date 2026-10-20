@@ -1,0 +1,94 @@
+id: act2-08-interrupted-mid-count
+act: 2
+level: 8
+title: Interrupted mid-count
+technique: loose
+teaches: []
+reuses: [stash, "stash pop", switch, status, "diff --staged", add, "commit -m"]
+requires: [act2-07-keep-both-jobs]
+budget_exception: >-
+  No new commands. Stash again, this time with one change staged and one
+  not - the case where people assume something was lost.
+first_month_moment: "Interrupted mid-thought, and picking it back up."
+estimated_minutes: 12
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-208
+  from: "Theo Banda, stock controller"
+  title: Interrupted mid-count
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: head_on_branch
+    name: aisle-b-count
+    label: "Be back on your branch, `aisle-b-count`"
+    story: "Back in the counting bay."
+
+  - kind: commit_reachable
+    from: aisle-b-count
+    not_from: "tutorial:act2-desk"
+    file_matches:
+      path: stock/aisle-b.md
+      matches: "22 bundles"
+    label: "The staged edit to `stock/aisle-b.md` came back and is committed"
+    story: "The B-15 count is booked in."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: aisle-b-count
+    contains: "Cartons in B-15 counted"
+    label: "The unstaged edit to `dispatch/log.md` came back too, in the same commit"
+    story: "The log line made it back as well."
+
+  - kind: stash_count
+    exactly: 0
+    label: "Nothing left in the stash"
+    story: "The back room is empty."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Nothing left uncommitted in the working tree"
+    story: "Count finished, sheet filed."
+
+  - kind: branch_at
+    name: main
+    commit: "tutorial:act2-desk"
+    label: "`main` is untouched: you only went to look at that branch"
+    story: "You looked at the main line and left it as it was."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Two files are changed and they are not in the same state: one is
+      on the packing bench, one is only on the loading floor. Check
+      which is which before you move anything, because the question
+      people get wrong is whether the back room takes both.
+  - after_idle: 420s
+    text: |
+      It takes both. One command puts every pending change aside,
+      staged and unstaged together, and the matching command brings
+      the whole lot back.
+
+      Go and look at main, then come back and restore.
+  - after_idle: 900s
+    text: |
+      Look, stash, visit, return:
+
+        git status
+        git diff --staged
+        git stash
+        git switch main
+        cat stock/aisle-b.md
+        git switch aisle-b-count
+        git stash pop
+
+      Then finish the job, both files in one commit:
+
+        git add stock/aisle-b.md dispatch/log.md
+        git commit -m "Count the cartons in B-15"

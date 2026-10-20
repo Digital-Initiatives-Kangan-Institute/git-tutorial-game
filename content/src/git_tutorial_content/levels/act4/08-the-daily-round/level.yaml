@@ -1,0 +1,89 @@
+id: act4-08-the-daily-round
+act: 4
+level: 8
+title: The daily round
+technique: loose
+teaches: []
+reuses: [pull, push, "commit -m", add, status, "log --oneline"]
+requires: [act4-07-finish-ines-job]
+budget_exception: >-
+  No new commands, and no disaster either. Every other level in this act
+  is a problem; this is the ordinary morning the problems interrupt, and a
+  student who has only ever met `pull` while something was wrong does not
+  know what the normal case looks like.
+first_month_moment: "An unremarkable morning: catch up, do a thing, publish it."
+estimated_minutes: 10
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-408
+  from: "Marta Vos, warehouse manager"
+  title: The daily round
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: graph_linear
+    from: "tutorial:act4-desk"
+    to: main
+    label: "Keep the history a straight line: a `git pull` with nothing of your own makes no merge commit"
+    story: "One clean run of records, no join."
+
+  - kind: commit_reachable
+    from: main
+    message_matches: "^Note the returns procedure"
+    label: "Pull Ines's commit into `main`"
+    story: "Head Office's overnight note has arrived."
+
+  - kind: file_content
+    path: dispatch/log.md
+    at: "origin/main"
+    contains: "- B-15 cartons counted."
+    label: "Push your `dispatch/log.md` line to `origin/main`"
+    story: "Your log line has gone up to Head Office."
+
+  - kind: ahead_behind
+    branch: main
+    upstream: origin/main
+    ahead: 0
+    behind: 0
+    label: "Leave nothing waiting between `main` and `origin/main` in either direction"
+    story: "Your records and Head Office's match."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean"
+    story: "A tidy floor at the end of the round."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Three steps, all of them things you have done. Take Head Office's
+      updates, add your line to the log, send it up.
+  - after_idle: 420s
+    text: |
+      `git pull` first. You have no commits of your own yet, so there
+      is nothing to merge: your `main` simply moves forwards to where
+      `origin/main` is. Git calls that a fast-forward.
+
+      Then edit, commit, and push.
+  - after_idle: 900s
+    text: |
+      The whole morning:
+
+        git pull
+
+      Add this line under the others in the list in `dispatch/log.md`:
+
+        - B-15 cartons counted.
+
+      Then:
+
+        git add dispatch/log.md
+        git commit -m "Note the B-15 count in the log"
+        git push
+        git status

@@ -1,0 +1,95 @@
+id: act4-07-finish-ines-job
+act: 4
+level: 7
+title: Finish Ines's job
+technique: loose
+teaches: []
+reuses: [fetch, push, switch, "commit -m", add, status]
+requires: [act4-06-look-before-you-fold]
+budget_exception: >-
+  No new commands. Every remote command the act has taught, used on a
+  branch that is not yours and not main - which is where a junior
+  actually spends their second week, and the first time `switch` does
+  something they have not seen it do.
+first_month_moment: "Ines is off sick and her branch is one sentence from done."
+estimated_minutes: 14
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-407
+  from: "Marta Vos, warehouse manager"
+  title: Finish Ines's job
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: branch_exists
+    name: returns-procedure
+    label: "Have a local `returns-procedure` branch for her work"
+    story: "Ines's job bay, open on your side too."
+
+  - kind: commit_reachable
+    from: returns-procedure
+    message_matches: "^Start the returns section"
+    label: "Build on Ines's commit rather than replacing it"
+    story: "Her half of the record stays, with her name on it."
+
+  - kind: file_content
+    path: docs/receiving.md
+    at: returns-procedure
+    contains: "booked in against the original delivery note."
+    label: "Commit the finished sentence in `docs/receiving.md`"
+    story: "The returns procedure says what to do."
+
+  - kind: remote_ref_at
+    remote: origin
+    branch: returns-procedure
+    equals: returns-procedure
+    label: "Push, so origin has your commit too"
+    story: "Head Office has the finished procedure."
+
+  - kind: tracks
+    branch: returns-procedure
+    upstream: origin/returns-procedure
+    label: "Pair the branch with `origin/returns-procedure` as its upstream"
+    story: "Your bay and hers are the same job."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave the working tree clean: nothing uncommitted"
+    story: "Nothing left lying about."
+
+hints:
+  - after_idle: 180s
+    text: |
+      Her branch is at Head Office, and your copy of the records has
+      never heard of it. One command changes that: the one that only
+      reads the bulletin.
+  - after_idle: 420s
+    text: |
+      After `git fetch`, `git branch -r` lists what the remote has.
+
+      Then `git switch returns-procedure`, with no `-c`, notices that a
+      remote branch of that name exists, makes you a local branch from
+      it, and pairs the two. It only works because you fetched first.
+  - after_idle: 900s
+    text: |
+      Get it, finish it, send it back:
+
+        git fetch
+        git branch -r
+        git switch returns-procedure
+
+      Finish the sentence in `docs/receiving.md` so it reads:
+
+        Returned pallets are booked in against the original delivery note.
+
+      Then:
+
+        git add docs/receiving.md
+        git commit -m "Finish the returns sentence"
+        git push

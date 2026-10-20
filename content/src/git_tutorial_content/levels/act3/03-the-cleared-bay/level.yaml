@@ -1,0 +1,96 @@
+id: act3-03-the-cleared-bay
+act: 3
+level: 3
+title: The bay that was cleared
+technique: strict
+teaches: []
+reuses: [reflog, "switch -c", branch, "log --oneline", status]
+requires: [act3-02-the-gate-log]
+budget_exception: >-
+  No new commands. Reading the reflog was the last level; using what it
+  says is this one, and the gap between those two is where the lesson
+  lives. A student who can read the record and still believes the work
+  is gone has not learned anything yet.
+first_month_moment: "You deleted a branch git told you was not merged, and said yes anyway."
+estimated_minutes: 14
+setup: setup.py
+solution: solution.sh
+
+job:
+  ticket: JOB-303
+  from: "Theo Banda, stock controller"
+  title: The bay that was cleared
+
+prose:
+  intro: prose/intro.md
+  brief: prose/brief.md
+  success: prose/success.md
+
+assert:
+  - kind: branch_exists
+    name: fennick-note
+    label: "Make the `fennick-note` branch exist again"
+    story: "The job bay has its sign back."
+
+  - kind: commit_count
+    from: fennick-note
+    not_from: main
+    exactly: 2
+    label: "Put both of its commits back on `fennick-note`, not a retyped replacement"
+    story: "Both crates fetched in from the yard, seals unbroken."
+
+  - kind: file_content
+    path: dispatch/2025-03-03.md
+    at: fennick-note
+    contains: "marked fragile because it carries the glass cloches"
+    label: "Recover the commit that finished the sentence in `dispatch/2025-03-03.md`"
+    story: "The 3 March note says what the third pallet is."
+
+  - kind: file_content
+    path: dispatch/2025-03-03.md
+    at: fennick-note
+    contains: "glass cloches, 24"
+    label: "Recover the commit that listed the pallets, too"
+    story: "And the pallet list under it."
+
+  - kind: not_used_command
+    ops: [commit]
+    on_ref: fennick-note
+    label: "Recover the branch without making a new commit on it"
+    story: "Fetched back, not booked in a second time."
+
+  - kind: status_clean
+    allow_untracked: true
+    label: "Leave nothing pending in the working tree"
+    story: "A tidy floor at the end of it."
+
+hints:
+  - after_idle: 180s
+    text: |
+      The crates are out in the yard, not destroyed. What was cleared
+      was the bay's sign: the branch *name*. A name is the cheapest
+      thing in git to make again.
+
+      Start with `git reflog`, the gate log.
+  - after_idle: 420s
+    text: |
+      Find the reflog line for the last commit made on that branch,
+      the one that listed the pallets. The hash at the start of it is
+      the tip you lost.
+
+      Then make a branch there. You know two commands that create a
+      branch at a commit you name.
+  - after_idle: 900s
+    text: |
+      Find the tip, then point a name at it:
+
+        git reflog
+        git branch fennick-note <the hash from the reflog>
+
+      `git switch -c fennick-note <hash>` does the same and takes you
+      there as well. Either way you are making a label, not making the
+      work again, which is why the job refuses a new commit.
+
+      Check it with:
+
+        git log --oneline main..fennick-note
